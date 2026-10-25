@@ -1,17 +1,18 @@
 ---
 /**
- * Examples teaser: placeholder cards for the example homepages to come.
- * They're labelled "Example design", never as client work.
+ * Examples teaser: cards for the example homepages. They're labelled
+ * "Example design", never as client work. A card with an `href` links to its
+ * finished example page; the rest show "Coming soon".
  *
  * When the examples page exists, change `links.examples` in src/data/site.ts
  * to '/examples/' and the "See all examples" link appears automatically.
  */
 import { links } from '../../data/site';
 
-const examples = [
-  { kind: 'Bakery', note: 'Fresh bakes, opening hours and how to order, front and centre.', accent: 'var(--skin)' },
-  { kind: 'Personal trainer', note: 'Sessions, prices and an easy way to book a first chat.', accent: 'var(--kiwi-deep)' },
-  { kind: 'Nails and beauty', note: 'Treatments, a price list and booking, looking as polished as your work.', accent: 'var(--forest)' },
+const examples: { kind: string; note: string; accent: string; href?: string }[] = [
+  { kind: 'Bakery', note: 'Fresh bakes, opening hours and how to order, front and centre.', accent: 'var(--coral)', href: '/examples/bakery/' },
+  { kind: 'Personal trainer', note: 'Sessions, prices and an easy way to book a first chat.', accent: 'var(--leaf)', href: '/examples/personal-trainer/' },
+  { kind: 'Nails and beauty', note: 'Treatments, a price list and booking, looking as polished as your work.', accent: 'var(--coral-deep)', href: '/examples/nails-and-beauty/' },
 ];
 
 // True once examples points at a real page instead of this section.
@@ -22,10 +23,9 @@ const pageLive = !links.examples.startsWith('/#');
   <div class="container">
     <div class="section-head" data-reveal>
       <p class="eyebrow">Examples</p>
-      <h2 id="examples-title">Example sites are on the way</h2>
+      <h2 id="examples-title">See what yours could look like</h2>
       <p>
-        I'm building a set of example homepages for different kinds of local business, so you can see what yours could look
-        like.
+        Three example homepages for three very different local businesses, each with its own look. Have a click around.
       </p>
     </div>
 
@@ -59,9 +59,9 @@ const pageLive = !links.examples.startsWith('/#');
             </div>
             <div class="example-body">
               <p class="label">
-                Example design <span class="soon">Coming soon</span>
+                Example design {ex.href ? <span class="live">Live</span> : <span class="soon">Coming soon</span>}
               </p>
-              <h3>{ex.kind}</h3>
+              <h3>{ex.href ? <a href={ex.href}>{ex.kind}</a> : ex.kind}</h3>
               <p class="note">{ex.note}</p>
             </div>
           </li>
@@ -125,13 +125,13 @@ const pageLive = !links.examples.startsWith('/#');
     gap: 0.3rem;
     padding: 0.5rem 0.6rem;
     border-bottom: 1px solid var(--line);
-    background: var(--cream);
+    background: var(--paper);
   }
   .browser-bar span {
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
-    background: var(--cream-line);
+    background: var(--paper-line);
   }
   .page {
     padding: 0.75rem;
@@ -157,7 +157,7 @@ const pageLive = !links.examples.startsWith('/#');
   .links {
     width: 3.5rem;
     height: 0.4rem;
-    background: var(--cream-line);
+    background: var(--paper-line);
   }
   .page-hero {
     display: grid;
@@ -193,7 +193,7 @@ const pageLive = !links.examples.startsWith('/#');
   }
   .page-cards i {
     height: 2rem;
-    background: var(--cream);
+    background: var(--paper);
   }
 
   /* ---------- Text ---------- */
@@ -214,9 +214,32 @@ const pageLive = !links.examples.startsWith('/#');
   .soon {
     padding: 0.1rem 0.55rem;
     border-radius: 999px;
-    background: var(--forest);
-    color: var(--kiwi-light);
+    background: var(--ink);
+    color: var(--lime);
     font-size: 0.75rem;
+  }
+  .live {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: var(--leaf);
+    color: var(--paper-raised);
+    font-size: 0.75rem;
+  }
+  /* The whole card is clickable when it links to an example. */
+  .example {
+    position: relative;
+  }
+  .example h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .example h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .example h3 a:hover {
+    text-decoration: underline;
   }
   .note {
     margin-top: 0.3rem;
