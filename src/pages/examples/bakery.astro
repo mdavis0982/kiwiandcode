@@ -1,0 +1,1165 @@
+---
+/**
+ * Example site: Little Loaf Bakehouse, a made-up bakery. It's a one-page demo
+ * to show what a small bakery's homepage could look like, so it's
+ * deliberately a bit showy: rising headline, floating bakes, a live "open now"
+ * badge and a countdown to the next tray out of the oven.
+ *
+ * Everything about the business (name, town, prices, hours) is invented.
+ */
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource-variable/fraunces/full-italic.css';
+import '@fontsource-variable/inter/wght.css';
+import ExampleLayout from '../../layouts/ExampleLayout.astro';
+
+// Hand-drawn bakes, used in the hero and on the menu cards. Decorative only.
+const bakes = {
+  loaf: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="74" rx="38" ry="6" fill="#2b1810" opacity=".12"/><path d="M12 64C12 28 88 28 88 64v4c0 5-76 5-76 0z" fill="#c8813f"/><path d="M12 64c0 5 76 5 76 0" fill="none" stroke="#9a5420" stroke-width="2"/><path d="M28 50q8-9 16-5M44 44q8-9 16-5M60 48q7-7 13-3" fill="none" stroke="#f6dcae" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+  croissant: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="76" rx="36" ry="5" fill="#2b1810" opacity=".12"/><g fill="#d48a3c" stroke="#9a5420" stroke-width="2"><ellipse cx="20" cy="64" rx="10" ry="7" transform="rotate(-50 20 64)"/><ellipse cx="80" cy="64" rx="10" ry="7" transform="rotate(50 80 64)"/><ellipse cx="33" cy="50" rx="13" ry="10" transform="rotate(-30 33 50)"/><ellipse cx="67" cy="50" rx="13" ry="10" transform="rotate(30 67 50)"/><ellipse cx="50" cy="44" rx="16" ry="13"/></g><path d="M42 38q8-4 16 0" fill="none" stroke="#f6c37a" stroke-width="3" stroke-linecap="round"/></svg>`,
+  swirl: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="84" rx="30" ry="5" fill="#2b1810" opacity=".12"/><circle cx="50" cy="54" r="32" fill="#d9944d"/><path d="M50 54a4 4 0 0 1 8 0a8 8 0 0 1-16 0a12 12 0 0 1 24 0a16 16 0 0 1-32 0a20 20 0 0 1 40 0a24 24 0 0 1-48 0" fill="none" stroke="#7a3e16" stroke-width="3.5" stroke-linecap="round"/><path d="M28 40l10 8 8-10 10 9 8-9 10 8" fill="none" stroke="#fff8ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  traybake: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="80" rx="34" ry="5" fill="#2b1810" opacity=".12"/><rect x="18" y="58" width="64" height="20" rx="3" fill="#e9c27e"/><rect x="18" y="48" width="64" height="12" fill="#c87d2e"/><path d="M18 50v-8q0-4 4-4h56q4 0 4 4v8q-4 4-8 0t-8 2-8-2-8 2-8-2-8 2-8-2-8 2-8 0z" fill="#4a2616"/><circle cx="30" cy="68" r="1.6" fill="#c99a5a"/><circle cx="50" cy="72" r="1.6" fill="#c99a5a"/><circle cx="68" cy="66" r="1.6" fill="#c99a5a"/></svg>`,
+  cake: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="82" rx="32" ry="5" fill="#2b1810" opacity=".12"/><rect x="22" y="44" width="56" height="34" rx="4" fill="#f3d29a"/><rect x="22" y="59" width="56" height="5" fill="#c2364f"/><path d="M22 46q0-8 8-8h40q8 0 8 8v2q-6 4-12 0-6 5-12 0-6 5-12 0-6 5-12 0-4 3-8 0z" fill="#fff3e3"/><circle cx="50" cy="31" r="7" fill="#d9304a"/><path d="M46 24l4 4 4-4" fill="none" stroke="#3f7a2a" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  farl: `<svg viewBox="0 0 100 100"><ellipse cx="48" cy="80" rx="34" ry="5" fill="#2b1810" opacity=".12"/><path d="M18 76V30a46 46 0 0 1 46 46z" fill="#e8c48e" stroke="#c99a5a" stroke-width="2"/><g fill="#fffaf0"><circle cx="30" cy="52" r="2"/><circle cx="42" cy="62" r="1.6"/><circle cx="28" cy="68" r="1.4"/><circle cx="46" cy="48" r="1.2"/><circle cx="54" cy="68" r="1.8"/></g></svg>`,
+};
+
+type Category = 'bread' | 'pastry' | 'sweet';
+
+const menu: { name: string; note: string; price: string; cat: Category; icon: keyof typeof bakes; tag?: string }[] = [
+  { name: 'Country sourdough', note: 'A slow 48-hour rise, a crackly crust and a soft, open middle.', price: '£4.50', cat: 'bread', icon: 'loaf', tag: 'Best seller' },
+  { name: 'Wheaten bread', note: 'The Northern Irish classic, made with buttermilk and wholemeal.', price: '£3.20', cat: 'bread', icon: 'loaf' },
+  { name: 'Soda farls', note: 'Griddled every morning. Made for an Ulster fry.', price: '£2.40 for 4', cat: 'bread', icon: 'farl' },
+  { name: 'Butter croissant', note: 'Three days of folding, 27 flaky layers, real French butter.', price: '£2.20', cat: 'pastry', icon: 'croissant' },
+  { name: 'Cinnamon swirl', note: 'Brown sugar, cinnamon and a vanilla icing drizzle.', price: '£2.80', cat: 'pastry', icon: 'swirl', tag: 'Gone by 11' },
+  { name: 'Pain au chocolat', note: 'Our croissant dough wrapped around two bars of dark chocolate.', price: '£2.50', cat: 'pastry', icon: 'croissant' },
+  { name: "Millionaire's shortbread", note: 'Buttery shortbread, soft caramel, a thick snap of chocolate.', price: '£2.60', cat: 'sweet', icon: 'traybake' },
+  { name: 'Fifteens', note: 'Digestives, marshmallows and cherries, rolled in coconut.', price: '£2.40', cat: 'sweet', icon: 'traybake' },
+  { name: 'Victoria sponge', note: 'Light sponge, raspberry jam and fresh cream, by the slice.', price: '£3.50', cat: 'sweet', icon: 'cake' },
+];
+
+const filters: { id: 'all' | Category; label: string }[] = [
+  { id: 'all', label: 'Everything' },
+  { id: 'bread', label: 'Bread' },
+  { id: 'pastry', label: 'Pastries' },
+  { id: 'sweet', label: 'Sweet treats' },
+];
+
+const ticker = ['Sourdough', 'Cinnamon swirls', 'Wheaten bread', 'Croissants', 'Fifteens', 'Soda farls', 'Traybakes', 'Celebration cakes'];
+
+// Opening hours, Monday first. Times are 24-hour "HH:MM". null means closed.
+// The script below reads this to show "Open now" and highlight today.
+const hours: { day: string; open: string | null; close: string | null }[] = [
+  { day: 'Monday', open: null, close: null },
+  { day: 'Tuesday', open: '07:30', close: '16:00' },
+  { day: 'Wednesday', open: '07:30', close: '16:00' },
+  { day: 'Thursday', open: '07:30', close: '16:00' },
+  { day: 'Friday', open: '07:30', close: '16:00' },
+  { day: 'Saturday', open: '08:00', close: '15:00' },
+  { day: 'Sunday', open: '09:00', close: '13:00' },
+];
+
+const stats = [
+  { value: 48, suffix: 'h', label: 'to rise every sourdough loaf' },
+  { value: 4, suffix: 'am', label: 'when the first oven goes on' },
+  { value: 100, suffix: '%', label: 'real butter, never margarine' },
+];
+
+const headline = ['Baked', 'before', "you're"];
+---
+
+<ExampleLayout
+  title="Little Loaf Bakehouse | Example bakery website"
+  description="An example bakery homepage designed by Kiwi and Code. Little Loaf Bakehouse is a made-up business."
+>
+  <div class="bakery">
+    <header class="nav">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true" set:html={bakes.loaf} />
+        Little Loaf
+      </a>
+      <nav aria-label="Main">
+        <a href="#bakes">Bakes</a>
+        <a href="#story">Our story</a>
+        <a href="#visit">Visit</a>
+      </nav>
+      <a class="btn btn--small" href="#visit">Order ahead</a>
+    </header>
+
+    <main id="top">
+      <!-- ---------- Hero ---------- -->
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="status" data-status hidden>
+            <span class="status-dot"></span>
+            <span data-status-text></span>
+          </p>
+          <h1>
+            {
+              headline.map((word, i) => (
+                <>
+                  <span class="word" style={`--i: ${i}`}>
+                    {word}
+                  </span>{' '}
+                </>
+              ))
+            }
+            <em class="word" style={`--i: ${headline.length}`}>awake.</em>
+          </h1>
+          <p class="lead">
+            Sourdough, flaky croissants and proper Northern Irish traybakes, made from scratch every morning on Main Street,
+            Ballyfern.
+          </p>
+          <div class="actions">
+            <a class="btn" href="#bakes">
+              See today's bakes
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </a>
+            <a class="btn btn--ghost" href="#visit">Find us</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="plate"></div>
+          <svg class="badge" viewBox="0 0 200 200">
+            <defs>
+              <path id="badge-circle" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0" />
+            </defs>
+            <text><textPath href="#badge-circle" textLength="460" lengthAdjust="spacing">Fresh every morning · Baked since 4am ·</textPath></text>
+          </svg>
+          <div class="float float--loaf">
+            <div class="steam"><i></i><i></i><i></i></div>
+            <Fragment set:html={bakes.loaf} />
+          </div>
+          <div class="float float--croissant" set:html={bakes.croissant} />
+          <div class="float float--swirl" set:html={bakes.swirl} />
+          <div class="float float--cake" set:html={bakes.cake} />
+          <span class="sprinkle s1"></span>
+          <span class="sprinkle s2"></span>
+          <span class="sprinkle s3"></span>
+          <span class="sprinkle s4"></span>
+        </div>
+      </section>
+
+      <!-- ---------- Ticker ---------- -->
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          {
+            [0, 1].map(() => (
+              <p>
+                {ticker.map((item) => (
+                  <span>
+                    {item} <b>✺</b>
+                  </span>
+                ))}
+              </p>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- ---------- Bakes ---------- -->
+      <section id="bakes" class="section">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">On the counter today</p>
+          <h2>Something for <em>every</em> kind of morning</h2>
+        </div>
+
+        <div class="oven" data-reveal data-oven hidden>
+          <span class="oven-icon" aria-hidden="true">🔥</span>
+          <p>
+            Next tray out of the oven in <strong data-oven-time>--:--</strong>
+          </p>
+        </div>
+
+        <div class="filters" role="group" aria-label="Filter bakes" data-reveal>
+          {
+            filters.map((f, i) => (
+              <button type="button" class="filter" data-filter={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {f.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <ul class="menu">
+          {
+            menu.map((item, i) => (
+              <li class="card" data-cat={item.cat} data-reveal style={`--delay: ${(i % 3) * 90}ms`}>
+                <div class="card-art" aria-hidden="true" set:html={bakes[item.icon]} />
+                {item.tag && <span class="tag">{item.tag}</span>}
+                <div class="card-body">
+                  <h3>{item.name}</h3>
+                  <p>{item.note}</p>
+                </div>
+                <p class="price">{item.price}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- ---------- Story ---------- -->
+      <section id="story" class="story">
+        <div class="story-inner">
+          <blockquote data-reveal>
+            <p>
+              “We started with one oven and my granny's wheaten recipe. Ten years on, the oven's bigger, but the recipe hasn't
+              changed a bit.”
+            </p>
+            <footer>Aoife, owner and head baker</footer>
+          </blockquote>
+
+          <ul class="stats">
+            {
+              stats.map((s, i) => (
+                <li data-reveal style={`--delay: ${i * 120}ms`}>
+                  <p class="stat">
+                    <span data-count={s.value}>{s.value}</span>
+                    {s.suffix}
+                  </p>
+                  <p>{s.label}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+
+      <!-- ---------- Visit ---------- -->
+      <section id="visit" class="section visit">
+        <div class="visit-copy" data-reveal>
+          <p class="eyebrow">Come and see us</p>
+          <h2>Follow the smell of <em>fresh bread</em></h2>
+          <p class="address">14 Main Street, Ballyfern, County Down</p>
+          <p class="small">Order cakes and big bread orders 48 hours ahead, in the shop or by phone.</p>
+
+          <table class="hours">
+            <caption class="visually-hidden">Opening hours</caption>
+            <tbody>
+              {
+                hours.map((h, i) => (
+                  <tr data-day={i}>
+                    <th scope="row">{h.day}</th>
+                    <td>{h.open ? `${h.open} – ${h.close}` : 'Closed'}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="map" data-reveal style="--delay: 120ms" aria-hidden="true">
+          <svg viewBox="0 0 400 320">
+            <rect width="400" height="320" fill="#efe2c9" />
+            <path d="M-10 210C80 190 150 240 240 200s140-30 180-20" fill="none" stroke="#9cc2c9" stroke-width="22" stroke-linecap="round" />
+            <g fill="none" stroke="#fbf4e8" stroke-width="14" stroke-linecap="round">
+              <path d="M0 120h400" />
+              <path d="M150 0v320" />
+              <path d="M290 0l-40 320" />
+              <path d="M0 40l150 80" />
+            </g>
+            <g fill="#dccaa6">
+              <rect x="20" y="140" width="110" height="40" rx="6" />
+              <rect x="170" y="20" width="90" height="80" rx="6" />
+              <rect x="300" y="20" width="80" height="80" rx="6" />
+              <rect x="170" y="140" width="80" height="40" rx="6" />
+              <rect x="20" y="250" width="110" height="50" rx="6" />
+              <rect x="300" y="240" width="90" height="60" rx="6" />
+            </g>
+            <circle cx="70" cy="70" r="26" fill="#b9c99a" />
+            <circle cx="100" cy="85" r="16" fill="#b9c99a" />
+          </svg>
+          <div class="pin">
+            <span class="pin-pulse"></span>
+            <span class="pin-head" set:html={bakes.croissant} />
+          </div>
+          <p class="map-label">Little Loaf</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p class="foot-big">Little <em>Loaf</em></p>
+      <p>14 Main Street, Ballyfern · Tuesday to Sunday</p>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- Menu filters ----------
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('.card');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        cards.forEach((card) => {
+          card.hidden = cat !== 'all' && card.dataset.cat !== cat;
+        });
+      }),
+    );
+
+    // ---------- Open now / today's hours ----------
+    // Reads the hours table, so changing the hours in the page data is enough.
+    const rows = document.querySelectorAll<HTMLTableRowElement>('.hours tr');
+    const toMinutes = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+    const now = new Date();
+    const today = (now.getDay() + 6) % 7; // Monday = 0
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    const todayRow = rows[today];
+    todayRow?.classList.add('is-today');
+
+    const [open, close] = (todayRow?.querySelector('td')?.textContent ?? '').split(' – ');
+    const isOpen = Boolean(close) && minutes >= toMinutes(open) && minutes < toMinutes(close);
+
+    const status = document.querySelector<HTMLElement>('[data-status]');
+    const statusText = document.querySelector<HTMLElement>('[data-status-text]');
+    if (status && statusText) {
+      statusText.textContent = isOpen ? `Open now, until ${close}` : 'Closed right now. See our hours below';
+      status.classList.toggle('is-open', isOpen);
+      status.hidden = false;
+    }
+
+    // ---------- Next tray countdown ----------
+    // While the shop is open, a fresh tray comes out every half hour.
+    const oven = document.querySelector<HTMLElement>('[data-oven]');
+    const ovenTime = document.querySelector<HTMLElement>('[data-oven-time]');
+    if (isOpen && oven && ovenTime) {
+      oven.hidden = false;
+      const tick = () => {
+        const d = new Date();
+        const secs = 1800 - ((d.getMinutes() % 30) * 60 + d.getSeconds());
+        ovenTime.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+      };
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    // ---------- Count-up stats ----------
+    const counters = document.querySelectorAll<HTMLElement>('[data-count]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      const countObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            const target = Number(el.dataset.count);
+            const start = performance.now();
+            const step = (t: number) => {
+              const p = Math.min((t - start) / 1400, 1);
+              el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
+              if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+            countObserver.unobserve(el);
+          }
+        },
+        { threshold: 0.6 },
+      );
+      counters.forEach((el) => {
+        el.textContent = '0';
+        countObserver.observe(el);
+      });
+    }
+  </script>
+</ExampleLayout>
+
+<style>
+  .bakery {
+    --flour: #fbf4e8;
+    --dough: #f3e3c8;
+    --crust: #b8662a;
+    --crust-deep: #8a4513;
+    --cocoa: #2b1810;
+    --cocoa-soft: #5c4334;
+    --berry: #c8364e;
+    --butter: #f6c453;
+    --sage: #4f6b2e;
+    --serif: 'Fraunces Variable', Georgia, serif;
+    --sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    background: var(--flour);
+    color: var(--cocoa);
+    font-family: var(--sans);
+    font-size: clamp(1rem, 0.97rem + 0.15vw, 1.1rem);
+    overflow-x: clip;
+  }
+  .bakery :is(h1, h2, h3) {
+    font-family: var(--serif);
+    font-variation-settings:
+      'SOFT' 100,
+      'WONK' 1;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .bakery em {
+    font-style: italic;
+    color: var(--berry);
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.4rem;
+    border: 2px solid var(--cocoa);
+    border-radius: 999px;
+    background: var(--cocoa);
+    color: var(--flour);
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 var(--butter);
+    transition:
+      transform 0.25s var(--spring),
+      box-shadow 0.25s var(--spring);
+  }
+  .btn svg {
+    width: 1.1rem;
+    transition: transform 0.25s var(--spring);
+  }
+  .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--butter);
+  }
+  .btn:hover svg {
+    transform: translateX(3px);
+  }
+  .btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--butter);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--cocoa);
+    box-shadow: none;
+  }
+  .btn--ghost:hover {
+    background: var(--dough);
+    box-shadow: none;
+  }
+  .btn--small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    box-shadow: 3px 3px 0 var(--butter);
+  }
+  .bakery :focus-visible {
+    outline: 3px solid var(--berry);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem var(--gutter);
+    background: color-mix(in srgb, var(--flour) 85%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid color-mix(in srgb, var(--cocoa) 10%, transparent);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--cocoa);
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-variation-settings: 'SOFT' 100;
+    text-decoration: none;
+  }
+  .brand-mark {
+    display: block;
+    width: 2.2rem;
+    transition: transform 0.4s var(--spring);
+  }
+  .brand:hover .brand-mark {
+    transform: rotate(-12deg) scale(1.1);
+  }
+  .nav nav {
+    display: none;
+    gap: 1.75rem;
+  }
+  .nav nav a {
+    color: var(--cocoa-soft);
+    font-weight: 500;
+    text-decoration: none;
+    background: linear-gradient(var(--berry), var(--berry)) 0 100% / 0 2px no-repeat;
+    transition: background-size 0.3s var(--ease);
+  }
+  .nav nav a:hover {
+    color: var(--cocoa);
+    background-size: 100% 2px;
+  }
+  @media (min-width: 48rem) {
+    .nav nav {
+      display: flex;
+    }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+    align-items: center;
+    gap: 2rem;
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 1rem + 5vw, 5rem) var(--gutter) clamp(3rem, 2rem + 5vw, 6rem);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: var(--dough);
+    color: var(--cocoa-soft);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .status-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--cocoa-soft);
+  }
+  .status.is-open {
+    color: var(--sage);
+  }
+  .status.is-open .status-dot {
+    background: #5e9e2f;
+    box-shadow: 0 0 0 0 rgb(94 158 47 / 0.6);
+    animation: ping 1.8s infinite;
+  }
+  @keyframes ping {
+    70%,
+    100% {
+      box-shadow: 0 0 0 10px rgb(94 158 47 / 0);
+    }
+  }
+  .hero h1 {
+    font-size: clamp(3rem, 1.6rem + 6.5vw, 6.75rem);
+  }
+  .word {
+    display: inline-block;
+    animation: rise 0.9s var(--ease) both;
+    animation-delay: calc(var(--i) * 110ms + 100ms);
+  }
+  .hero h1 em {
+    position: relative;
+    isolation: isolate;
+    padding-right: 0.08em;
+  }
+  /* Hand-drawn underline that "draws" itself after the words land. */
+  .hero h1 em::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.02em;
+    height: 0.18em;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M3 14C50 4 120 2 197 10' fill='none' stroke='%23f6c453' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E")
+      0 0 / 100% 100% no-repeat;
+    transform-origin: left;
+    animation: draw 0.7s var(--ease) 0.9s both;
+    z-index: -1;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.6em) rotate(4deg);
+    }
+  }
+  @keyframes draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .lead {
+    max-width: 32rem;
+    margin-top: 1.5rem;
+    color: var(--cocoa-soft);
+    font-size: 1.15em;
+    animation: fade 0.8s var(--ease) 0.6s both;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    animation: fade 0.8s var(--ease) 0.75s both;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* Plate of floating bakes */
+  .hero-art {
+    position: relative;
+    width: min(100%, 30rem);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    animation: pop 1s var(--spring) 0.3s both;
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.85) rotate(-6deg);
+    }
+  }
+  .plate {
+    position: absolute;
+    inset: 12%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--butter) 0 62%, #f0b638 63% 66%, var(--butter) 67%);
+    box-shadow:
+      inset 0 -14px 0 rgb(0 0 0 / 0.06),
+      0 30px 60px -20px rgb(138 69 19 / 0.45);
+  }
+  .badge {
+    position: absolute;
+    inset: 0;
+    animation: spin 24s linear infinite;
+  }
+  .badge text {
+    fill: var(--crust-deep);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .float {
+    position: absolute;
+    filter: drop-shadow(0 10px 12px rgb(43 24 16 / 0.18));
+    animation: bob 5s ease-in-out infinite;
+  }
+  .float--loaf {
+    top: 30%;
+    left: 24%;
+    width: 52%;
+  }
+  .float--croissant {
+    top: 14%;
+    right: 8%;
+    width: 30%;
+    animation-delay: -1.2s;
+    --tilt: 14deg;
+  }
+  .float--swirl {
+    bottom: 10%;
+    left: 6%;
+    width: 30%;
+    animation-delay: -2.4s;
+    --tilt: -10deg;
+  }
+  .float--cake {
+    bottom: 6%;
+    right: 12%;
+    width: 26%;
+    animation-delay: -3.4s;
+    --tilt: 8deg;
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(var(--tilt, 0deg));
+    }
+    50% {
+      transform: translateY(-14px) rotate(calc(var(--tilt, 0deg) * -0.5));
+    }
+  }
+  .steam {
+    position: absolute;
+    top: -6%;
+    left: 50%;
+    display: flex;
+    gap: 14%;
+    width: 40%;
+    transform: translateX(-50%);
+  }
+  .steam i {
+    flex: 1;
+    height: 3.5rem;
+    border-radius: 999px;
+    background: linear-gradient(to top, rgb(255 255 255 / 0.9), transparent);
+    filter: blur(4px);
+    animation: steam 3s ease-out infinite;
+  }
+  .steam i:nth-child(2) {
+    animation-delay: 0.8s;
+  }
+  .steam i:nth-child(3) {
+    animation-delay: 1.6s;
+  }
+  @keyframes steam {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scaleY(0.6);
+    }
+    40% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-30px) scaleY(1.2) skewX(10deg);
+    }
+  }
+  .sprinkle {
+    position: absolute;
+    width: 0.5rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    animation: bob 4s ease-in-out infinite;
+  }
+  .s1 {
+    top: 8%;
+    left: 20%;
+    background: var(--berry);
+    --tilt: 30deg;
+  }
+  .s2 {
+    top: 50%;
+    right: 2%;
+    background: var(--sage);
+    --tilt: -40deg;
+    animation-delay: -1s;
+  }
+  .s3 {
+    bottom: 2%;
+    left: 44%;
+    background: var(--crust);
+    --tilt: 70deg;
+    animation-delay: -2s;
+  }
+  .s4 {
+    top: 40%;
+    left: 0;
+    background: var(--butter);
+    --tilt: -15deg;
+    animation-delay: -3s;
+  }
+
+  @media (min-width: 56rem) {
+    .hero {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+
+  /* ---------- Ticker ---------- */
+  .ticker {
+    overflow: hidden;
+    padding: 1rem 0;
+    background: var(--cocoa);
+    color: var(--flour);
+    transform: rotate(-1.5deg) scale(1.03);
+  }
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+  }
+  .ticker p {
+    display: flex;
+    flex-shrink: 0;
+  }
+  .ticker span {
+    padding-right: 1.5rem;
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 1rem + 1.5vw, 2.2rem);
+    font-style: italic;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .ticker b {
+    padding-left: 1.5rem;
+    color: var(--butter);
+    font-style: normal;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ---------- Sections ---------- */
+  .section {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(4rem, 3rem + 5vw, 7rem) var(--gutter);
+  }
+  .section-head {
+    max-width: 40rem;
+    margin-bottom: 2rem;
+  }
+  .eyebrow {
+    margin-bottom: 0.75rem;
+    color: var(--crust-deep);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .bakery h2 {
+    font-size: clamp(2.2rem, 1.5rem + 3vw, 3.75rem);
+  }
+
+  /* Oven countdown */
+  .oven {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 0.6rem 1.1rem 0.6rem 0.75rem;
+    border: 2px dashed var(--crust);
+    border-radius: 999px;
+    color: var(--cocoa-soft);
+  }
+  .oven strong {
+    color: var(--berry);
+    font-variant-numeric: tabular-nums;
+  }
+  .oven-icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--dough);
+    animation: flicker 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes flicker {
+    to {
+      transform: scale(1.12) rotate(-6deg);
+    }
+  }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .filter {
+    padding: 0.5rem 1.1rem;
+    border: 2px solid var(--cocoa);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--cocoa);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s,
+      transform 0.25s var(--spring);
+  }
+  .filter:hover {
+    transform: translateY(-2px);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--cocoa);
+    color: var(--flour);
+  }
+
+  /* Menu cards */
+  .menu {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 1.25rem;
+    border: 2px solid var(--cocoa);
+    border-radius: 1.5rem;
+    background: #fffaf2;
+    box-shadow: 6px 6px 0 var(--dough);
+    transition:
+      transform 0.35s var(--spring),
+      box-shadow 0.35s var(--spring);
+  }
+  .card[hidden] {
+    display: none;
+  }
+  .card:hover {
+    transform: translateY(-6px) rotate(-1deg);
+    box-shadow: 10px 12px 0 var(--butter);
+  }
+  .card-art {
+    width: 7rem;
+    margin: -0.25rem auto 0.5rem;
+    transition: transform 0.5s var(--spring);
+  }
+  .card:hover .card-art {
+    transform: scale(1.15) rotate(-8deg);
+  }
+  .tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: var(--berry);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transform: rotate(4deg);
+  }
+  .card h3 {
+    margin-bottom: 0.35rem;
+    font-size: 1.5rem;
+  }
+  .card-body p {
+    color: var(--cocoa-soft);
+    font-size: 0.95rem;
+  }
+  .price {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 2px dotted color-mix(in srgb, var(--cocoa) 25%, transparent);
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--crust-deep);
+  }
+  @media (min-width: 40rem) {
+    .menu {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 64rem) {
+    .menu {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* ---------- Story ---------- */
+  .story {
+    position: relative;
+    background: var(--crust-deep);
+    color: var(--flour);
+    /* Scalloped top edge, like a pie crust. */
+    background-image: radial-gradient(circle at 1.25rem -0.5rem, var(--flour) 1.3rem, transparent 1.35rem);
+    background-size: 2.5rem 2rem;
+    background-repeat: repeat-x;
+  }
+  .story-inner {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 4rem + 5vw, 8rem) var(--gutter) clamp(4rem, 3rem + 5vw, 7rem);
+  }
+  blockquote p {
+    max-width: 52rem;
+    font-family: var(--serif);
+    font-size: clamp(1.7rem, 1.2rem + 2.2vw, 3rem);
+    font-style: italic;
+    font-variation-settings: 'SOFT' 100;
+    line-height: 1.2;
+  }
+  blockquote footer {
+    margin-top: 1.25rem;
+    color: var(--butter);
+    font-weight: 600;
+  }
+  .stats {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .stats li {
+    padding-top: 1rem;
+    border-top: 2px solid rgb(251 244 232 / 0.25);
+    color: var(--dough);
+  }
+  .stat {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 2rem + 4vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--butter);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 48rem) {
+    .stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* ---------- Visit ---------- */
+  .visit {
+    display: grid;
+    align-items: center;
+    gap: 3rem;
+  }
+  .address {
+    margin-top: 1.25rem;
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+  .small {
+    margin-top: 0.4rem;
+    color: var(--cocoa-soft);
+  }
+  .hours {
+    width: 100%;
+    max-width: 26rem;
+    margin-top: 1.75rem;
+    border-collapse: collapse;
+  }
+  .hours th,
+  .hours td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--cocoa) 12%, transparent);
+    text-align: left;
+  }
+  .hours th {
+    font-weight: 500;
+  }
+  .hours td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .hours tr.is-today {
+    background: var(--butter);
+    font-weight: 700;
+  }
+  .hours tr.is-today th::after {
+    content: ' · today';
+    font-size: 0.8em;
+    font-weight: 600;
+  }
+  .map {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--cocoa);
+    border-radius: 1.5rem;
+    box-shadow: 8px 8px 0 var(--dough);
+  }
+  .map svg {
+    width: 100%;
+  }
+  .pin {
+    position: absolute;
+    top: 40%;
+    left: 44%;
+    width: 4.5rem;
+    height: 4.5rem;
+    transform: translate(-50%, -50%);
+  }
+  .pin-head {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 0.5rem;
+    border: 3px solid var(--cocoa);
+    border-radius: 50% 50% 50% 0;
+    background: #fffaf2;
+    transform: rotate(-45deg);
+    animation: drop 0.8s var(--spring) both;
+  }
+  .pin-head :global(svg) {
+    transform: rotate(45deg);
+  }
+  .pin-pulse {
+    position: absolute;
+    left: 0;
+    bottom: -0.75rem;
+    width: 1.5rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--berry);
+    animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(0.5);
+    }
+    to {
+      opacity: 0;
+      transform: scale(3);
+    }
+  }
+  @keyframes drop {
+    from {
+      transform: translateY(-60px) rotate(-45deg);
+      opacity: 0;
+    }
+  }
+  .map-label {
+    position: absolute;
+    top: calc(40% + 3rem);
+    left: 44%;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background: var(--cocoa);
+    color: var(--flour);
+    font-size: 0.85rem;
+    font-weight: 700;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  @media (min-width: 56rem) {
+    .visit {
+      grid-template-columns: 1fr 1.1fr;
+    }
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    padding: 3rem var(--gutter) 2.5rem;
+    background: var(--cocoa);
+    color: var(--dough);
+    text-align: center;
+  }
+  .foot-big {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 2rem + 6vw, 7rem);
+    font-variation-settings:
+      'SOFT' 100,
+      'WONK' 1;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--flour);
+  }
+  .foot-big em {
+    color: var(--butter);
+  }
+  .foot p:last-child {
+    margin-top: 0.75rem;
+  }
+</style>

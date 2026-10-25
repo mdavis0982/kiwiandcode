@@ -1,0 +1,1258 @@
+---
+/**
+ * Example site: Caitlin, a made-up personal trainer from Carryduff. Like the
+ * bakery, it's a one-page demo and meant to be a bit showy: slide-in headline,
+ * a "workout tracker" card, a goal picker that redraws a sample week, and
+ * confetti on the booking button.
+ *
+ * The business, prices and reviews are invented. The photo spot is a
+ * placeholder until there's a real photo to drop in.
+ */
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/inter/wght.css';
+import ExampleLayout from '../../layouts/ExampleLayout.astro';
+
+const workout = [
+  { name: 'Back squats', sets: '4 × 8' },
+  { name: 'Romanian deadlifts', sets: '3 × 10' },
+  { name: 'Hip thrusts', sets: '3 × 12' },
+  { name: 'Walking lunges', sets: '3 × 20' },
+];
+
+const ticker = ['1:1 training', 'Online coaching', 'Strength', 'Confidence', 'Carryduff'];
+
+const services = [
+  {
+    name: '1:1 training',
+    blurb: 'Just you and me. Every session planned around your goals, with form checked on every rep.',
+    points: ['Tailored programme', 'Progress check-ins', 'Nutrition guidance'],
+    price: '£30',
+    per: 'a session',
+  },
+  {
+    name: 'Train with a friend',
+    blurb: 'Bring a mate and split the session. More fun, more accountability, same attention.',
+    points: ['2 to 3 people', 'Shared programme', 'Friendly competition'],
+    price: '£20',
+    per: 'each, a session',
+    featured: true,
+  },
+  {
+    name: 'Online coaching',
+    blurb: 'Your plan in an app, wherever you train, with weekly check-ins to keep you on track.',
+    points: ['Train anywhere', 'Video form checks', 'Weekly check-ins'],
+    price: '£60',
+    per: 'a month',
+  },
+];
+
+// Sample weeks for the goal picker. Each day is a session type; the script
+// below swaps them in when a goal is picked.
+type Session = 'Strength' | 'Cardio' | 'Mobility' | 'Rest';
+const weeks: Record<string, { label: string; days: Session[] }> = {
+  strong: { label: 'Get stronger', days: ['Strength', 'Mobility', 'Strength', 'Rest', 'Strength', 'Cardio', 'Rest'] },
+  lean: { label: 'Lose fat', days: ['Strength', 'Cardio', 'Strength', 'Cardio', 'Strength', 'Cardio', 'Rest'] },
+  fit: { label: 'Get fitter', days: ['Cardio', 'Strength', 'Cardio', 'Mobility', 'Cardio', 'Strength', 'Rest'] },
+  confident: { label: 'Feel confident', days: ['Strength', 'Rest', 'Cardio', 'Mobility', 'Strength', 'Rest', 'Rest'] },
+};
+const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const firstWeek = weeks.strong.days;
+
+const steps = [
+  { title: 'Free chat', text: "A relaxed 15-minute call. Tell me where you're at and where you want to be." },
+  { title: 'Your plan', text: 'I build a programme around your goals, your schedule and the kit you have.' },
+  { title: 'Train & check in', text: 'We train, track every session and adjust as you get stronger.' },
+];
+
+const reviews = [
+  { quote: "I used to be scared of the weights section. Now I'm in there three times a week and I genuinely love it.", name: 'Niamh, 29' },
+  { quote: "Caitlin makes every session feel like a laugh, then you realise you've just done the hardest workout of your life.", name: 'Ciarán, 34' },
+  { quote: 'Down a dress size and up 40kg on my deadlift. Best decision I made all year.', name: 'Sarah, 41' },
+];
+
+const headline = [
+  { text: 'Stronger', style: 'solid' },
+  { text: 'than', style: 'outline' },
+  { text: 'last week.', style: 'accent' },
+];
+---
+
+<ExampleLayout
+  title="Caitlin | Personal training in Carryduff | Example website"
+  description="An example personal trainer homepage designed by Kiwi and Code. Caitlin's training business is made up."
+>
+  <div class="pt">
+    <header class="nav">
+      <a class="brand" href="#top">Caitlin<span>.</span></a>
+      <nav aria-label="Main">
+        <a href="#about">About</a>
+        <a href="#training">Training</a>
+        <a href="#how">How it works</a>
+      </nav>
+      <a class="btn btn--small" href="#book">Book a free chat</a>
+    </header>
+
+    <main id="top">
+      <!-- ---------- Hero ---------- -->
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Personal training · Carryduff &amp; online</p>
+          <h1>
+            {
+              headline.map((line, i) => (
+                <span class={`line line--${line.style}`} style={`--i: ${i}`}>
+                  {line.text}
+                </span>
+              ))
+            }
+          </h1>
+          <p class="lead">
+            I'm Caitlin, a 23-year-old personal trainer from Carryduff. I help people get strong, feel confident and actually
+            enjoy training.
+          </p>
+          <div class="actions">
+            <a class="btn" href="#book">
+              Book a free chat
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </a>
+            <a class="btn btn--ghost" href="#how">How it works</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="glow"></div>
+
+          <div class="photo">
+            <span class="photo-initial">C</span>
+            <span class="photo-note">Photo of Caitlin here</span>
+          </div>
+          <p class="sticker">Hi, I'm Caitlin 👋</p>
+
+          <div class="tracker">
+            <div class="tracker-head">
+              <div>
+                <p class="tracker-label">Today</p>
+                <p class="tracker-title">Lower body</p>
+              </div>
+              <svg class="ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" />
+                <circle class="ring-fill" cx="22" cy="22" r="18" pathLength="100" />
+                <text x="22" y="26">80%</text>
+              </svg>
+            </div>
+            <svg class="pulse" viewBox="0 0 240 40" preserveAspectRatio="none">
+              <path d="M0 22h60l8-14 10 28 10-30 8 16h40l6-8 8 14 6-6h84" pathLength="100" />
+            </svg>
+            <ul class="sets">
+              {
+                workout.map((ex, i) => (
+                  <li style={`--i: ${i}`}>
+                    <span class="tick">✓</span>
+                    <span class="set-name">{ex.name}</span>
+                    <span class="set-reps">{ex.sets}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Ticker ---------- -->
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          {
+            [0, 1].map(() => (
+              <p>
+                {ticker.map((item, i) => (
+                  <span class={i % 2 ? 'outline' : ''}>
+                    {item} <b>✦</b>
+                  </span>
+                ))}
+              </p>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- ---------- About ---------- -->
+      <section id="about" class="section about">
+        <div data-reveal>
+          <p class="eyebrow eyebrow--dark">About me</p>
+          <h2>Hi, I'm <span class="hl">Caitlin.</span></h2>
+        </div>
+        <div class="about-copy" data-reveal style="--delay: 100ms">
+          <p class="big">
+            I'm 23 and I'm from Carryduff, so I'm training people right here in my own community, and online wherever you are.
+          </p>
+          <p>
+            I fell for the gym at 18, when lifting gave me a confidence nothing else had. Now I want everyone to feel that,
+            whether it's your first squat or your hundredth. Expect good music, bad jokes and a lot of high fives.
+          </p>
+          <ul class="pills">
+            <li>No judgement</li>
+            <li>Plans that fit your life</li>
+            <li>Strength first</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ---------- Training ---------- -->
+      <section id="training" class="section section--dark">
+        <div class="section-inner">
+          <div class="section-head" data-reveal>
+            <p class="eyebrow">Ways to train</p>
+            <h2>Pick what <span class="hl hl--dark">works for you</span></h2>
+          </div>
+
+          <ul class="services">
+            {
+              services.map((s, i) => (
+                <li class:list={['service', { 'service--featured': s.featured }]} data-reveal style={`--delay: ${i * 100}ms`}>
+                  <div class="service-inner">
+                    {s.featured && <span class="badge">Most fun</span>}
+                    <h3>{s.name}</h3>
+                    <p>{s.blurb}</p>
+                    <ul>
+                      {s.points.map((p) => (
+                        <li>{p}</li>
+                      ))}
+                    </ul>
+                    <p class="price">
+                      <strong>{s.price}</strong> {s.per}
+                    </p>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+
+          <!-- Goal picker -->
+          <div class="planner" data-reveal>
+            <div class="planner-head">
+              <h3>What's your goal?</h3>
+              <div class="goals" role="group" aria-label="Pick a goal">
+                {
+                  Object.entries(weeks).map(([id, w], i) => (
+                    <button type="button" class="goal" data-goal={id} aria-pressed={i === 0 ? 'true' : 'false'}>
+                      {w.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+            <ol class="week" aria-live="polite">
+              {
+                dayNames.map((day, i) => (
+                  <li class="day" data-type={firstWeek[i]}>
+                    <span class="bar">
+                      <span class="bar-fill" />
+                    </span>
+                    <span class="day-name">{day}</span>
+                    <span class="day-type">{firstWeek[i]}</span>
+                  </li>
+                ))
+              }
+            </ol>
+            <p class="planner-note">A sample week. Your real plan is built around you.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- How it works ---------- -->
+      <section id="how" class="section">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow eyebrow--dark">How it works</p>
+          <h2>Three steps to <span class="hl">day one</span></h2>
+        </div>
+        <ol class="steps">
+          {
+            steps.map((s, i) => (
+              <li data-reveal style={`--delay: ${i * 120}ms`}>
+                <span class="step-num">0{i + 1}</span>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <ul class="reviews">
+          {
+            reviews.map((r, i) => (
+              <li data-reveal style={`--delay: ${i * 120}ms`}>
+                <p class="stars" aria-label="5 out of 5 stars">★★★★★</p>
+                <blockquote>“{r.quote}”</blockquote>
+                <p class="reviewer">{r.name}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- ---------- Book ---------- -->
+      <section id="book" class="book">
+        <div class="book-inner" data-reveal>
+          <h2>Ready when <br />you are.</h2>
+          <p>Book a free 15-minute chat. No pressure, no hard sell, just a plan.</p>
+          <button type="button" class="btn btn--light" data-book>Book a free chat</button>
+          <p class="book-note" data-book-note hidden>This is an example site, so there's no real booking, but you get confetti.</p>
+        </div>
+        <div class="confetti" data-confetti aria-hidden="true"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p class="foot-big">Caitlin<span>.</span></p>
+      <p>Personal training in Carryduff, County Down, and online</p>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- Goal picker ----------
+    // Sample weeks are rendered into data-week on each button by the page data
+    // below, so the script never needs to know the goals in advance.
+    const goals = document.querySelectorAll<HTMLButtonElement>('[data-goal]');
+    const days = document.querySelectorAll<HTMLElement>('.day');
+    const weekData = JSON.parse(document.querySelector('#week-data')?.textContent ?? '{}') as Record<string, string[]>;
+
+    goals.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        goals.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        const week = weekData[btn.dataset.goal ?? ''] ?? [];
+        days.forEach((day, i) => {
+          day.dataset.type = week[i];
+          const label = day.querySelector('.day-type');
+          if (label) label.textContent = week[i];
+          // Restart the grow animation so the change is visible.
+          day.classList.remove('is-changing');
+          void day.offsetWidth;
+          day.classList.add('is-changing');
+        });
+      }),
+    );
+
+    // ---------- Confetti on the booking button ----------
+    const bookBtn = document.querySelector<HTMLButtonElement>('[data-book]');
+    const bookNote = document.querySelector<HTMLElement>('[data-book-note]');
+    const confetti = document.querySelector<HTMLElement>('[data-confetti]');
+    const colours = ['#ff4f5e', '#b9a6ff', '#e8ff59', '#ffffff', '#111018'];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    bookBtn?.addEventListener('click', () => {
+      if (bookNote) bookNote.hidden = false;
+      if (!confetti || reduceMotion) return;
+      const btnBox = bookBtn.getBoundingClientRect();
+      const box = confetti.getBoundingClientRect();
+      const x = btnBox.left + btnBox.width / 2 - box.left;
+      const y = btnBox.top + btnBox.height / 2 - box.top;
+      for (let i = 0; i < 60; i++) {
+        const bit = document.createElement('i');
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 120 + Math.random() * 220;
+        bit.style.left = `${x}px`;
+        bit.style.top = `${y}px`;
+        bit.style.background = colours[i % colours.length];
+        bit.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+        bit.style.setProperty('--dy', `${Math.sin(angle) * dist - 80}px`);
+        bit.style.setProperty('--r', `${Math.random() * 720 - 360}deg`);
+        confetti.append(bit);
+        bit.addEventListener('animationend', () => bit.remove());
+      }
+    });
+  </script>
+  <script type="application/json" id="week-data" set:html={JSON.stringify(Object.fromEntries(Object.entries(weeks).map(([id, w]) => [id, w.days])))} />
+</ExampleLayout>
+
+<style>
+  .pt {
+    --ink: #111018;
+    --ink-raised: #1c1a26;
+    --ink-line: #2e2b3b;
+    --paper: #f6f3ee;
+    --paper-line: #e4dfd6;
+    --coral: #ff4f5e;
+    --coral-deep: #d92f42;
+    --lilac: #b9a6ff;
+    --volt: #e8ff59;
+    --grey: #5d5a66;
+    --grey-light: #b6b3c0;
+    --display: 'Archivo Variable', 'Arial Black', sans-serif;
+    --sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: clamp(1rem, 0.97rem + 0.15vw, 1.1rem);
+    overflow-x: clip;
+  }
+  .pt :is(h1, h2, h3) {
+    font-family: var(--display);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .pt :focus-visible {
+    outline: 3px solid var(--coral);
+    outline-offset: 3px;
+  }
+  .eyebrow {
+    margin-bottom: 1rem;
+    color: var(--lilac);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .eyebrow--dark {
+    color: var(--coral-deep);
+  }
+  /* Highlighter swipe behind a word. */
+  .hl {
+    background: linear-gradient(transparent 55%, var(--lilac) 55% 90%, transparent 90%) 0 0 / 0 100% no-repeat;
+    transition: background-size 0.9s var(--ease) 0.3s;
+  }
+  .hl--dark {
+    background-image: linear-gradient(transparent 55%, var(--coral) 55% 90%, transparent 90%);
+  }
+  :global(.is-visible) .hl,
+  :global(html:not(.js)) .hl {
+    background-size: 100% 100%;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--coral);
+    color: var(--ink);
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      transform 0.25s var(--spring),
+      box-shadow 0.25s var(--ease);
+  }
+  .btn svg {
+    width: 1.1rem;
+    transition: transform 0.25s var(--spring);
+  }
+  .btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 30px -8px var(--coral);
+  }
+  .btn:hover svg {
+    transform: translateX(4px);
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--paper);
+    box-shadow: inset 0 0 0 2px var(--ink-line);
+  }
+  .btn--ghost:hover {
+    box-shadow: inset 0 0 0 2px var(--paper);
+  }
+  .btn--small {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .btn--light {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn--light:hover {
+    box-shadow: 0 12px 30px -8px var(--ink);
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem var(--gutter);
+    background: color-mix(in srgb, var(--ink) 85%, transparent);
+    backdrop-filter: blur(12px);
+    color: var(--paper);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .brand {
+    color: var(--paper);
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .brand span,
+  .foot-big span {
+    color: var(--coral);
+  }
+  .nav nav {
+    display: none;
+    gap: 1.75rem;
+  }
+  .nav nav a {
+    color: var(--grey-light);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav nav a:hover {
+    color: var(--volt);
+  }
+  @media (min-width: 48rem) {
+    .nav nav {
+      display: flex;
+    }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+    align-items: center;
+    gap: 3rem;
+    padding: clamp(2.5rem, 1rem + 5vw, 5rem) var(--gutter) clamp(3.5rem, 2rem + 5vw, 6rem);
+    background:
+      radial-gradient(60rem 30rem at 85% 10%, rgb(185 166 255 / 0.18), transparent 60%),
+      radial-gradient(40rem 30rem at 0% 100%, rgb(255 79 94 / 0.14), transparent 60%),
+      var(--ink);
+    color: var(--paper);
+  }
+  .hero > * {
+    max-width: 38rem;
+  }
+  .hero h1 {
+    display: grid;
+    margin-bottom: 1.5rem;
+    font-size: clamp(2.9rem, 1.2rem + 7vw, 6.5rem);
+  }
+  .line {
+    display: block;
+    animation: slide-in 0.9s var(--ease) both;
+    animation-delay: calc(var(--i) * 140ms + 100ms);
+  }
+  .line:nth-child(even) {
+    animation-name: slide-in-right;
+  }
+  .line--outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--paper);
+  }
+  .line--accent {
+    color: var(--coral);
+  }
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-1em) skewX(-12deg);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(1em) skewX(12deg);
+    }
+  }
+  .lead {
+    color: var(--grey-light);
+    font-size: 1.15em;
+    animation: fade 0.8s var(--ease) 0.6s both;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    animation: fade 0.8s var(--ease) 0.75s both;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* Photo placeholder + tracker card */
+  .hero-art {
+    position: relative;
+    width: 100%;
+    min-height: 26rem;
+    margin: 0 auto;
+  }
+  .glow {
+    position: absolute;
+    inset: 10% 5%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--coral), var(--lilac), var(--volt), var(--coral));
+    filter: blur(60px);
+    opacity: 0.35;
+    animation: spin 12s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .photo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 62%;
+    aspect-ratio: 4 / 5;
+    border-radius: 2rem;
+    background:
+      repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.04) 0 12px, transparent 12px 24px),
+      linear-gradient(160deg, var(--lilac), var(--coral));
+    overflow: hidden;
+    animation: rise 1s var(--ease) 0.3s both;
+  }
+  .photo-initial {
+    font-family: var(--display);
+    font-size: clamp(7rem, 4rem + 10vw, 11rem);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 1;
+    color: rgb(17 16 24 / 0.85);
+  }
+  .photo-note {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px dashed rgb(17 16 24 / 0.5);
+    border-radius: 999px;
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .sticker {
+    position: absolute;
+    top: 6%;
+    left: 4%;
+    z-index: 2;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: var(--volt);
+    color: var(--ink);
+    font-weight: 800;
+    transform: rotate(-8deg);
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    50% {
+      transform: rotate(-3deg) translateY(-6px);
+    }
+  }
+  .tracker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: min(18rem, 78%);
+    padding: 1.1rem;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    border-radius: 1.5rem;
+    background: rgb(28 26 38 / 0.8);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.6);
+    animation: rise 1s var(--ease) 0.6s both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+  }
+  .tracker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .tracker-label {
+    color: var(--grey-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .tracker-title {
+    font-family: var(--display);
+    font-size: 1.3rem;
+    font-stretch: 112%;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .ring {
+    width: 3.5rem;
+    transform: rotate(-90deg);
+  }
+  .ring circle {
+    fill: none;
+    stroke: var(--ink-line);
+    stroke-width: 5;
+  }
+  .ring .ring-fill {
+    stroke: var(--volt);
+    stroke-linecap: round;
+    stroke-dasharray: 80 100;
+    animation: ring 1.6s var(--ease) 1s both;
+  }
+  .ring text {
+    fill: var(--paper);
+    font-size: 11px;
+    font-weight: 800;
+    text-anchor: middle;
+    transform: rotate(90deg);
+    transform-origin: 22px 22px;
+  }
+  @keyframes ring {
+    from {
+      stroke-dasharray: 0 100;
+    }
+  }
+  .pulse {
+    width: 100%;
+    height: 2.25rem;
+    margin: 0.6rem 0;
+  }
+  .pulse path {
+    fill: none;
+    stroke: var(--coral);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-dasharray: 100;
+    animation: pulse 2.4s linear infinite;
+  }
+  @keyframes pulse {
+    from {
+      stroke-dashoffset: 100;
+    }
+    to {
+      stroke-dashoffset: -100;
+    }
+  }
+  .sets {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+  .sets li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .tick {
+    display: grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: var(--volt);
+    color: var(--ink);
+    font-size: 0.7rem;
+    font-weight: 900;
+    animation: tick 0.5s var(--spring) both;
+    animation-delay: calc(var(--i) * 350ms + 1.4s);
+  }
+  @keyframes tick {
+    from {
+      transform: scale(0);
+    }
+  }
+  .set-name {
+    flex: 1;
+  }
+  .set-reps {
+    color: var(--grey-light);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: 1.15fr 1fr;
+      justify-content: center;
+    }
+    .hero-art {
+      min-height: 32rem;
+    }
+    /* Keep the headline inside its column next to the photo. */
+    .hero h1 {
+      font-size: min(6.5rem, 5.4vw);
+    }
+  }
+
+  /* ---------- Ticker ---------- */
+  .ticker {
+    overflow: hidden;
+    padding: 1.1rem 0;
+    background: var(--coral);
+    color: var(--ink);
+  }
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 22s linear infinite;
+  }
+  .ticker p {
+    display: flex;
+    flex-shrink: 0;
+  }
+  .ticker span {
+    padding-right: 1.5rem;
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 1rem + 2vw, 2.75rem);
+    font-stretch: 62%;
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .ticker .outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--ink);
+  }
+  .ticker b {
+    padding-left: 1.5rem;
+    color: var(--ink);
+    -webkit-text-stroke: 0;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ---------- Sections ---------- */
+  .section {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(4rem, 3rem + 5vw, 7rem) var(--gutter);
+  }
+  .section--dark {
+    max-width: none;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .section-inner {
+    max-width: 76rem;
+    margin: 0 auto;
+  }
+  .section-head {
+    max-width: 44rem;
+    margin-bottom: 2.5rem;
+  }
+  .pt h2 {
+    font-size: clamp(2.2rem, 1.3rem + 4vw, 4.5rem);
+  }
+
+  /* About */
+  .about {
+    display: grid;
+    gap: 2rem;
+  }
+  .about-copy {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .big {
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .pills li {
+    padding: 0.45rem 1rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    font-weight: 700;
+    transition:
+      background 0.2s,
+      transform 0.25s var(--spring);
+  }
+  .pills li:hover {
+    background: var(--volt);
+    transform: rotate(-3deg) scale(1.05);
+  }
+  @media (min-width: 56rem) {
+    .about {
+      grid-template-columns: 1fr 1.2fr;
+      align-items: start;
+    }
+  }
+
+  /* Services */
+  .services {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+  .service {
+    position: relative;
+    padding: 2px;
+    border-radius: 1.6rem;
+    background: var(--ink-line);
+    transition: transform 0.35s var(--spring);
+  }
+  .service:hover {
+    transform: translateY(-6px);
+  }
+  /* Featured card gets a spinning gradient border. */
+  .service--featured {
+    overflow: hidden;
+    background: none;
+  }
+  .service--featured::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(var(--coral), var(--lilac), var(--volt), var(--coral));
+    animation: spin 5s linear infinite;
+  }
+  .service-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.75rem;
+    border-radius: calc(1.6rem - 2px);
+    background: var(--ink-raised);
+  }
+  .badge {
+    align-self: flex-start;
+    margin-bottom: 1rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background: var(--volt);
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .service h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.6rem;
+  }
+  .service-inner > p {
+    color: var(--grey-light);
+  }
+  .service ul {
+    display: grid;
+    gap: 0.4rem;
+    margin: 1.25rem 0;
+    padding: 0;
+    list-style: none;
+  }
+  .service ul li::before {
+    content: '→ ';
+    color: var(--coral);
+    font-weight: 800;
+  }
+  .price {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--ink-line);
+    color: var(--grey-light);
+  }
+  .price strong {
+    color: var(--paper);
+    font-family: var(--display);
+    font-size: 2.2rem;
+    font-stretch: 125%;
+    font-weight: 900;
+  }
+  .service--featured .price strong {
+    color: var(--volt);
+  }
+  @media (min-width: 56rem) {
+    .services {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Goal picker */
+  .planner {
+    margin-top: 3rem;
+    padding: clamp(1.25rem, 1rem + 2vw, 2.5rem);
+    border: 1px solid var(--ink-line);
+    border-radius: 1.6rem;
+    background: var(--ink-raised);
+  }
+  .planner-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .planner h3 {
+    font-size: 1.6rem;
+  }
+  .goals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .goal {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--ink-line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--paper);
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background 0.2s,
+      color 0.2s,
+      transform 0.25s var(--spring);
+  }
+  .goal:hover {
+    border-color: var(--paper);
+    transform: translateY(-2px);
+  }
+  .goal[aria-pressed='true'] {
+    border-color: var(--volt);
+    background: var(--volt);
+    color: var(--ink);
+  }
+  .week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: clamp(0.3rem, 0.1rem + 1vw, 1rem);
+    padding: 0;
+    list-style: none;
+  }
+  .day {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    text-align: center;
+    --h: 20%;
+    --c: var(--ink-line);
+  }
+  .day[data-type='Strength'] {
+    --h: 100%;
+    --c: var(--coral);
+  }
+  .day[data-type='Cardio'] {
+    --h: 75%;
+    --c: var(--lilac);
+  }
+  .day[data-type='Mobility'] {
+    --h: 45%;
+    --c: var(--volt);
+  }
+  .bar {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    height: 9rem;
+    border-radius: 0.75rem;
+    background: var(--ink);
+    overflow: hidden;
+  }
+  .bar-fill {
+    width: 100%;
+    height: var(--h);
+    border-radius: 0.75rem;
+    background: var(--c);
+    transition:
+      height 0.6s var(--spring),
+      background 0.3s;
+  }
+  .day.is-changing .bar-fill {
+    animation: grow 0.6s var(--spring);
+  }
+  @keyframes grow {
+    from {
+      transform: scaleY(0.4);
+      transform-origin: bottom;
+    }
+  }
+  .day-name {
+    font-weight: 800;
+  }
+  .day-type {
+    color: var(--grey-light);
+    font-size: clamp(0.6rem, 0.5rem + 0.4vw, 0.8rem);
+  }
+  .planner-note {
+    margin-top: 1.5rem;
+    color: var(--grey-light);
+    font-size: 0.9rem;
+  }
+
+  /* Steps */
+  .steps {
+    display: grid;
+    gap: 2rem;
+    padding: 0;
+    list-style: none;
+  }
+  .step-num {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-family: var(--display);
+    font-size: clamp(4rem, 3rem + 4vw, 6.5rem);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--ink);
+    transition:
+      color 0.3s,
+      -webkit-text-stroke-color 0.3s;
+  }
+  .steps li:hover .step-num {
+    color: var(--coral);
+    -webkit-text-stroke-color: var(--coral);
+  }
+  .steps h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+  .steps p {
+    color: var(--grey);
+  }
+  .reviews {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 4rem;
+    padding: 0;
+    list-style: none;
+  }
+  .reviews li {
+    padding: 1.5rem;
+    border: 2px solid var(--ink);
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 var(--lilac);
+    transition:
+      transform 0.35s var(--spring),
+      box-shadow 0.35s var(--spring);
+  }
+  .reviews li:nth-child(2) {
+    box-shadow: 6px 6px 0 var(--coral);
+  }
+  .reviews li:nth-child(3) {
+    box-shadow: 6px 6px 0 var(--volt);
+  }
+  .reviews li:hover {
+    transform: translate(-3px, -3px) rotate(-1deg);
+  }
+  .stars {
+    color: var(--coral);
+    letter-spacing: 0.15em;
+  }
+  .reviews blockquote {
+    margin: 0.75rem 0 1rem;
+    font-size: 1.05em;
+    font-weight: 500;
+  }
+  .reviewer {
+    color: var(--grey);
+    font-weight: 700;
+  }
+  @media (min-width: 48rem) {
+    .steps,
+    .reviews {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* ---------- Book ---------- */
+  .book {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4rem, 3rem + 6vw, 8rem) var(--gutter);
+    background: var(--coral);
+    color: var(--ink);
+    text-align: center;
+  }
+  .book h2 {
+    font-size: clamp(3rem, 1.5rem + 7vw, 7.5rem);
+  }
+  .book-inner > p {
+    max-width: 30rem;
+    margin: 1.5rem auto 2rem;
+    font-size: 1.15em;
+    font-weight: 500;
+  }
+  .book .book-note {
+    margin: 1.25rem auto 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  .confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .confetti :global(i) {
+    position: absolute;
+    width: 0.6rem;
+    height: 0.9rem;
+    border-radius: 2px;
+    animation: burst 1.4s var(--ease) forwards;
+  }
+  @keyframes burst {
+    to {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(var(--r));
+    }
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    padding: 3rem var(--gutter) 2.5rem;
+    background: var(--ink);
+    color: var(--grey-light);
+    text-align: center;
+  }
+  .foot-big {
+    font-family: var(--display);
+    font-size: clamp(3.5rem, 1.5rem + 9vw, 10rem);
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--paper);
+  }
+  .foot-big span {
+    -webkit-text-stroke: 0;
+  }
+  .foot p:last-child {
+    margin-top: 0.75rem;
+  }
+</style>

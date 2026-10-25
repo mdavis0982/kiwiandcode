@@ -8,5 +8,10 @@ export default defineConfig({
   site: 'https://kiwiandcode.co.uk',
   // Static HTML output: exactly what Cloudflare Pages wants.
   output: 'static',
-  integrations: [sitemap()],
+  // Example sites are noindex, so keep them out of the sitemap too.
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/examples/'),
+    }),
+  ],
 });
