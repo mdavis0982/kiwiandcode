@@ -1,19 +1,49 @@
 ---
 /**
- * Examples teaser: cards for the example homepages. They're labelled
- * "Example design", never as client work. A card with an `href` links to its
- * finished example page; the rest show "Coming soon".
+ * Examples teaser: one branded card per example site. Each preview is a tiny
+ * live-HTML version of that site's hero (its own logo, fonts and colours) in a
+ * browser frame, so visitors see three genuinely different looks at a glance.
+ * Cards are labelled "Example design", never as client work.
+ *
+ * Previews size their text with container query units (cqi), so they scale
+ * with the card. Only the weights the previews use are loaded here; the font
+ * files download when the cards are drawn.
  *
  * When the examples page exists, change `links.examples` in src/data/site.ts
  * to '/examples/' and the "See all examples" link appears automatically.
  */
+import '@fontsource-variable/fraunces/wght.css';
+import '@fontsource-variable/fraunces/wght-italic.css';
+import '@fontsource-variable/playfair-display/wght.css';
+import '@fontsource-variable/playfair-display/wght-italic.css';
 import { links } from '../../data/site';
 
-const examples: { kind: string; note: string; accent: string; href?: string }[] = [
-  { kind: 'Bakery', note: 'Fresh bakes, opening hours and how to order, front and centre.', accent: 'var(--coral)', href: '/examples/bakery/' },
-  { kind: 'Personal trainer', note: 'Sessions, prices and an easy way to book a first chat.', accent: 'var(--leaf)', href: '/examples/personal-trainer/' },
-  { kind: 'Nails and beauty', note: 'Treatments, a price list and booking, looking as polished as your work.', accent: 'var(--coral-deep)', href: '/examples/nails-and-beauty/' },
+const examples = [
+  {
+    id: 'bakery',
+    name: 'Little Loaf Bakehouse',
+    kind: 'Bakery',
+    note: 'Fresh bakes, opening hours and how to order, front and centre.',
+    href: '/examples/bakery/',
+  },
+  {
+    id: 'pt',
+    name: 'Caitlin',
+    kind: 'Personal trainer',
+    note: 'Sessions, prices and an easy way to book a first chat.',
+    href: '/examples/personal-trainer/',
+  },
+  {
+    id: 'nails',
+    name: 'Maison Lacquer',
+    kind: 'Nails and beauty',
+    note: 'Treatments, a price list and booking, looking as polished as your work.',
+    href: '/examples/nails-and-beauty/',
+  },
 ];
+
+// The bakery's loaf, simplified from its own page.
+const loaf = `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="74" rx="38" ry="6" fill="#2b1810" opacity=".12"/><path d="M12 64C12 28 88 28 88 64v4c0 5-76 5-76 0z" fill="#c8813f"/><path d="M28 50q8-9 16-5M44 44q8-9 16-5M60 48q7-7 13-3" fill="none" stroke="#f6dcae" stroke-width="3.5" stroke-linecap="round"/></svg>`;
 
 // True once examples points at a real page instead of this section.
 const pageLive = !links.examples.startsWith('/#');
@@ -32,37 +62,97 @@ const pageLive = !links.examples.startsWith('/#');
     <ul class="examples">
       {
         examples.map((ex, i) => (
-          <li class="example" data-reveal style={`--delay: ${i * 100}ms; --accent: ${ex.accent}`}>
-            {/* Mini browser window with a sketched page inside. Decorative only. */}
-            <div class="browser" aria-hidden="true">
-              <div class="browser-bar">
-                <span />
-                <span />
-                <span />
+          <li class="example" data-reveal style={`--delay: ${i * 100}ms`}>
+            <div class="card">
+              {/* Mini browser with the site's own hero inside. Decorative: the title link below covers the whole card. */}
+              <div class="browser" aria-hidden="true">
+                <div class="browser-bar">
+                  <span />
+                  <span />
+                  <span />
+                  <p class="url">{ex.name}</p>
+                </div>
+
+                <div class={`preview preview--${ex.id}`}>
+                  <div class="page">
+                    {ex.id === 'bakery' && (
+                      <>
+                        <div class="p-nav">
+                          <span class="p-logo">
+                            <i class="p-loaf" set:html={loaf} />
+                            Little Loaf
+                          </span>
+                          <span class="p-btn p-btn--small">Order ahead</span>
+                        </div>
+                        <div class="p-hero">
+                          <div>
+                            <p class="p-title">
+                              Baked before you're <em>awake.</em>
+                            </p>
+                            <span class="p-btn">See today's bakes</span>
+                          </div>
+                          <div class="p-plate">
+                            <i set:html={loaf} />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {ex.id === 'pt' && (
+                      <>
+                        <div class="p-nav">
+                          <span class="p-logo">
+                            Caitlin<b>.</b>
+                          </span>
+                          <span class="p-btn p-btn--small">Book a free chat</span>
+                        </div>
+                        <div class="p-hero">
+                          <p class="p-title">
+                            <span>Stronger</span>
+                            <span class="p-outline">than</span>
+                            <span class="p-coral">last week.</span>
+                          </p>
+                          <div class="p-photo">C</div>
+                        </div>
+                      </>
+                    )}
+
+                    {ex.id === 'nails' && (
+                      <>
+                        <div class="p-nav">
+                          <span class="p-logo">
+                            Maison <em>Lacquer</em>
+                          </span>
+                          <span class="p-btn p-btn--small">Book now</span>
+                        </div>
+                        <div class="p-hero">
+                          <p class="p-title">
+                            Nails that <em>do the talking.</em>
+                          </p>
+                          <div class="p-arch">
+                            <i style="--c: #b3122e; --r: -16deg" />
+                            <i style="--c: #4a1739; --r: 0deg" />
+                            <i style="--c: #e8cba8; --r: 16deg" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <span class="view">View site →</span>
               </div>
-              <div class="page">
-                <div class="page-nav">
-                  <i class="logo" />
-                  <i class="links" />
-                </div>
-                <div class="page-hero">
-                  <i class="line line--lg" />
-                  <i class="line line--md" />
-                  <i class="pill" />
-                </div>
-                <div class="page-cards">
-                  <i />
-                  <i />
-                  <i />
-                </div>
+
+              <div class="example-body">
+                <p class="label">Example design · {ex.kind}</p>
+                <h3>
+                  <a class="card-link" href={ex.href}>
+                    {ex.name}
+                    <span class="visually-hidden">, example {ex.kind.toLowerCase()} website</span>
+                  </a>
+                </h3>
+                <p class="note">{ex.note}</p>
               </div>
-            </div>
-            <div class="example-body">
-              <p class="label">
-                Example design {ex.href ? <span class="live">Live</span> : <span class="soon">Coming soon</span>}
-              </p>
-              <h3>{ex.href ? <a href={ex.href}>{ex.kind}</a> : ex.kind}</h3>
-              <p class="note">{ex.note}</p>
             </div>
           </li>
         ))
@@ -82,48 +172,89 @@ const pageLive = !links.examples.startsWith('/#');
 </section>
 
 <style>
+  /* Phone: a swipeable row that snaps card by card. Wider: three columns. */
   .examples {
     display: grid;
-    gap: var(--space-m);
-    padding: 0;
+    grid-auto-flow: column;
+    grid-auto-columns: min(85%, 22rem);
+    gap: var(--space-s);
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.5rem var(--gutter) 1.5rem;
     list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: thin;
   }
   .example {
+    scroll-snap-align: start;
+  }
+  @media (min-width: 48rem) {
+    .examples {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-m);
+      margin-inline: 0;
+      padding: 0;
+      overflow: visible;
+    }
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--surface);
+    color: inherit;
+    text-decoration: none;
     overflow: hidden;
     transition:
       transform 0.4s var(--ease-out),
-      box-shadow 0.4s var(--ease-out);
+      box-shadow 0.4s var(--ease-out),
+      border-color 0.3s;
   }
-  .example:hover {
+  /* The title link stretches over the whole card, so the card is one big target. */
+  .card-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+  }
+  .card-link:focus-visible {
+    outline: none;
+  }
+  .card:has(.card-link:focus-visible) {
+    outline: 3px solid var(--leaf);
+    outline-offset: 3px;
+  }
+  .card:hover,
+  .card:focus-within {
     transform: translateY(-6px);
     box-shadow: var(--shadow);
+    border-color: color-mix(in srgb, var(--text) 25%, transparent);
   }
 
-  /* ---------- Mini browser ---------- */
+  /* ---------- Browser frame ---------- */
   .browser {
     position: relative;
     margin: var(--space-s) var(--space-s) 0;
     border: 1px solid var(--line);
     border-bottom: 0;
     border-radius: 0.6rem 0.6rem 0 0;
-    background: #fff;
     overflow: hidden;
-  }
-  /* Shimmer sweeping across, like a page that's still loading. */
-  .browser::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%);
-    transform: translateX(-100%);
   }
   .browser-bar {
     display: flex;
+    align-items: center;
     gap: 0.3rem;
-    padding: 0.5rem 0.6rem;
+    padding: 0.45rem 0.6rem;
     border-bottom: 1px solid var(--line);
     background: var(--paper);
   }
@@ -133,113 +264,254 @@ const pageLive = !links.examples.startsWith('/#');
     border-radius: 50%;
     background: var(--paper-line);
   }
-  .page {
-    padding: 0.75rem;
-    transition: transform 0.6s var(--ease-out);
+  .url {
+    flex: 1;
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    background: var(--paper-raised);
+    color: var(--muted);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .example:hover .page {
-    transform: translateY(-6px);
-  }
-  .page i {
-    display: block;
-    border-radius: 0.25rem;
-  }
-  .page-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.9rem;
-  }
-  .logo {
-    width: 1.4rem;
-    height: 0.5rem;
-    background: var(--accent);
-  }
-  .links {
-    width: 3.5rem;
-    height: 0.4rem;
-    background: var(--paper-line);
-  }
-  .page-hero {
-    display: grid;
-    gap: 0.4rem;
-    padding: 0.9rem;
-    border-radius: 0.4rem;
-    background: color-mix(in srgb, var(--accent) 14%, white);
-    margin-bottom: 0.6rem;
-  }
-  .line {
-    height: 0.5rem;
-    background: color-mix(in srgb, var(--accent) 70%, white);
-  }
-  .line--lg {
-    width: 75%;
-    height: 0.7rem;
-    background: var(--accent);
-  }
-  .line--md {
-    width: 55%;
-  }
-  .pill {
-    width: 2.8rem;
-    height: 0.8rem;
-    margin-top: 0.3rem;
-    border-radius: 999px !important;
+  .view {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
     background: var(--kiwi);
+    color: var(--ink);
+    box-shadow: 0 6px 16px -6px rgb(13 27 20 / 0.5);
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.3s,
+      transform 0.4s var(--ease-spring);
   }
-  .page-cards {
+  .card:hover .view,
+  .card:focus-within .view {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- Previews (shared) ---------- */
+  .preview {
+    container-type: inline-size;
+    aspect-ratio: 16 / 11;
+    overflow: hidden;
+  }
+  .page {
+    height: 100%;
+    padding: 4cqi 5cqi;
+    transform-origin: 50% 0;
+    transition: transform 0.7s var(--ease-out);
+  }
+  .card:hover .page,
+  .card:focus-within .page {
+    transform: scale(1.06) translateY(-2%);
+  }
+  .p-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7cqi;
+  }
+  .p-logo {
+    display: flex;
+    align-items: center;
+    gap: 1.5cqi;
+    font-size: 5.4cqi;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .p-btn {
+    display: inline-block;
+    padding: 1.8cqi 3.6cqi;
+    border-radius: 999px;
+    font-size: 3.2cqi;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .p-btn--small {
+    padding: 1.3cqi 2.8cqi;
+    font-size: 2.8cqi;
+  }
+  .p-hero {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: 4cqi;
   }
-  .page-cards i {
-    height: 2rem;
-    background: var(--paper);
+  .p-title {
+    margin-bottom: 4cqi;
+    line-height: 1;
+  }
+  .preview em {
+    font-style: italic;
+  }
+
+  /* ---------- Little Loaf ---------- */
+  .preview--bakery {
+    background: #fbf4e8;
+    color: #2b1810;
+  }
+  .preview--bakery :is(.p-logo, .p-title) {
+    font-family: 'Fraunces Variable', Georgia, serif;
+    font-weight: 700;
+  }
+  .p-loaf {
+    width: 7cqi;
+  }
+  .preview--bakery .p-title {
+    font-size: 9cqi;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .preview--bakery em {
+    color: #c8364e;
+  }
+  .preview--bakery .p-btn {
+    background: #2b1810;
+    color: #fbf4e8;
+    box-shadow: 0.8cqi 0.8cqi 0 #f6c453;
+  }
+  .p-plate {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f6c453 0 62%, #f0b638 63% 66%, #f6c453 67%);
+    box-shadow: 0 4cqi 6cqi -3cqi rgb(138 69 19 / 0.45);
+  }
+  .p-plate i {
+    width: 70%;
+  }
+
+  /* ---------- Caitlin ---------- */
+  .preview--pt {
+    background:
+      radial-gradient(60cqi 40cqi at 90% 0%, rgb(185 166 255 / 0.25), transparent 60%),
+      #111018;
+    color: #f6f3ee;
+  }
+  .preview--pt :is(.p-logo, .p-title) {
+    font-family: 'Archivo Variable', sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .preview--pt .p-logo {
+    gap: 0;
+  }
+  .preview--pt .p-logo b {
+    color: #ff4f5e;
+  }
+  .preview--pt .p-btn {
+    background: #ff4f5e;
+    color: #111018;
+    font-weight: 800;
+  }
+  .preview--pt .p-title {
+    display: grid;
+    font-size: 8.4cqi;
+    line-height: 0.95;
+  }
+  .p-outline {
+    color: transparent;
+    -webkit-text-stroke: 0.3cqi #f6f3ee;
+  }
+  .p-coral {
+    color: #ff4f5e;
+  }
+  .p-photo {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    border-radius: 4cqi;
+    background: linear-gradient(160deg, #b9a6ff, #ff4f5e);
+    color: rgb(17 16 24 / 0.85);
+    font-family: 'Archivo Variable', sans-serif;
+    font-size: 22cqi;
+    font-stretch: 125%;
+    font-weight: 900;
+  }
+
+  /* ---------- Maison Lacquer ---------- */
+  .preview--nails {
+    background: #fff8f4;
+    color: #3b1424;
+  }
+  .preview--nails :is(.p-logo, .p-title) {
+    font-family: 'Playfair Display Variable', Georgia, serif;
+    font-weight: 600;
+  }
+  .preview--nails em {
+    color: #a3284f;
+  }
+  .preview--nails .p-title {
+    font-size: 9.6cqi;
+    font-weight: 500;
+  }
+  .preview--nails .p-btn {
+    background: #3b1424;
+    color: #fff8f4;
+    font-weight: 500;
+  }
+  .p-arch {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    aspect-ratio: 4 / 5;
+    padding-bottom: 10%;
+    border-radius: 999px 999px 2cqi 2cqi;
+    background: linear-gradient(180deg, #f7e1e3, #eccbcf);
+  }
+  .p-arch::before {
+    content: '';
+    position: absolute;
+    inset: 1.5cqi;
+    border: 1px solid #c99a7a;
+    border-radius: inherit;
+    opacity: 0.6;
+  }
+  .p-arch i {
+    width: 22%;
+    height: 50%;
+    margin-inline: -1%;
+    border-radius: 2cqi;
+    background:
+      linear-gradient(100deg, rgb(255 255 255 / 0.5) 0 14%, transparent 14%) 0 45% / 100% 55% no-repeat,
+      linear-gradient(90deg, #2a1019, #5a2a3c 45%, #2a1019) 50% 0 / 50% 42% no-repeat,
+      linear-gradient(var(--c), var(--c)) 0 100% / 100% 60% no-repeat;
+    transform: rotate(var(--r));
+    transform-origin: 50% 120%;
   }
 
   /* ---------- Text ---------- */
   .example-body {
+    flex: 1;
     padding: var(--space-m);
     border-top: 1px solid var(--line);
   }
   .label {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
     margin-bottom: 0.4rem;
     font-family: var(--font-mono);
     font-size: var(--step--1);
     color: var(--muted);
   }
-  .soon {
-    padding: 0.1rem 0.55rem;
-    border-radius: 999px;
-    background: var(--ink);
-    color: var(--lime);
-    font-size: 0.75rem;
-  }
-  .live {
-    padding: 0.1rem 0.55rem;
-    border-radius: 999px;
-    background: var(--leaf);
-    color: var(--paper-raised);
-    font-size: 0.75rem;
-  }
-  /* The whole card is clickable when it links to an example. */
-  .example {
-    position: relative;
-  }
-  .example h3 a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .example h3 a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-  .example h3 a:hover {
+  .card:hover h3,
+  .card:focus-within h3 {
     text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
   .note {
     margin-top: 0.3rem;
@@ -248,29 +520,5 @@ const pageLive = !links.examples.startsWith('/#');
   .all {
     margin-top: var(--space-l);
     text-align: center;
-  }
-
-  @media (min-width: 48rem) {
-    .examples {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .browser::after {
-      animation: shimmer 2.8s ease-in-out infinite;
-    }
-    .example:nth-child(2) .browser::after {
-      animation-delay: 0.4s;
-    }
-    .example:nth-child(3) .browser::after {
-      animation-delay: 0.8s;
-    }
-  }
-  @keyframes shimmer {
-    60%,
-    100% {
-      transform: translateX(100%);
-    }
   }
 </style>
