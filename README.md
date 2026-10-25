@@ -81,7 +81,15 @@ scripts/
 
 Sections use `theme-dark` or `theme-light` for colours, `container` for width and `data-reveal` for the fade-in animation.
 
-## Deploy to Cloudflare Pages
+## Deploy to Cloudflare Workers
+
+`wrangler.jsonc` serves the built `dist/` folder as a static site on Cloudflare Workers.
+
+1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Import a repository** and pick this repository.
+2. Project name `kiwiandcode` (it must match `name` in `wrangler.jsonc`). Build command `npm run build`, deploy command `npx wrangler deploy`.
+3. Once deployed, add `kiwiandcode.co.uk` under the Worker's **Settings → Domains & Routes → Add → Custom domain**.
+
+## Or deploy to Cloudflare Pages
 
 1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages → Connect to Git** and pick this repository.
 2. Framework preset: **Astro**. Build command `npm run build`, output directory `dist`.
