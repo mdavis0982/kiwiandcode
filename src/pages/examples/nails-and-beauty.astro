@@ -2,7 +2,7 @@
 /**
  * Example site: Maison Lacquer, a made-up nail and beauty studio. A one-page
  * demo, polished and a little luxe: shimmering headline, a fan of polish
- * bottles, a "try a shade" hand you can repaint with different finishes,
+ * bottles, a "try a shade" set of press-on nails you can repaint in different finishes,
  * a nail-art gallery drawn in CSS and a sparkle burst on the booking button.
  *
  * Everything about the business (name, town, prices, reviews) is invented.
@@ -24,17 +24,24 @@ const shades = [
 ];
 const finishes = ['Gloss', 'Matte', 'Chrome', 'Glitter'];
 
-// Fingers for the try-on hand, left to right: x position, height, nail width.
-const fingers = [
-  { x: 18, top: 92, w: 30, h: 150 },
-  { x: 62, top: 40, w: 32, h: 200 },
-  { x: 108, top: 22, w: 33, h: 220 },
-  { x: 155, top: 38, w: 32, h: 204 },
-  { x: 200, top: 78, w: 27, h: 164 },
-];
-// An almond nail shape, w wide and h tall, with its top-left at (0, 0).
+// Press-on nails for the shade preview, left to right: width and tilt.
+// They fan out from a shared baseline, tallest in the middle.
+const tips = [
+  { w: 38, tilt: -16 },
+  { w: 44, tilt: -8 },
+  { w: 48, tilt: 0 },
+  { w: 44, tilt: 8 },
+  { w: 38, tilt: 16 },
+].map((t, i, all) => {
+  const gap = 10;
+  const total = all.reduce((sum, n) => sum + n.w, 0) + gap * (all.length - 1);
+  const before = all.slice(0, i).reduce((sum, n) => sum + n.w + gap, 0);
+  return { ...t, h: t.w * 1.95, cx: (300 - total) / 2 + before + t.w / 2 };
+});
+// An almond nail shape, w wide and h tall, with its tip at the top and a
+// rounded cuticle end at the bottom.
 const nail = (w: number, h: number) =>
-  `M0 ${h}V${h * 0.45}C0 ${h * 0.1} ${w * 0.22} 0 ${w / 2} 0S${w} ${h * 0.1} ${w} ${h * 0.45}V${h}Z`;
+  `M0 ${h * 0.9}V${h * 0.48}C0 ${h * 0.18} ${w * 0.34} 0 ${w / 2} 0S${w} ${h * 0.18} ${w} ${h * 0.48}V${h * 0.9}Q${w / 2} ${h * 1.06} 0 ${h * 0.9}Z`;
 
 const bottles = ['#B3122E', '#F2C4CE', '#4A1739', '#E8CBA8', '#C99A7A'];
 
@@ -182,14 +189,14 @@ const reviews = [
           </fieldset>
         </div>
 
-        <div class="hand-wrap" data-reveal style="--delay: 120ms">
+        <div class="preview-wrap" data-reveal style="--delay: 120ms">
           <svg
-            class="hand finish-gloss"
-            data-hand
-            viewBox="0 0 245 330"
+            class="preview finish-gloss"
+            data-preview
+            viewBox="0 0 300 200"
             style={`--shade: ${shades[0].hex}`}
             role="img"
-            aria-label="A hand with painted nails showing the chosen shade"
+            aria-label="Five press-on nails showing the chosen shade and finish"
           >
             <defs>
               <linearGradient id="ml-chrome" x1="0" y1="0" x2="1" y2="1">
@@ -204,21 +211,25 @@ const reviews = [
                 <circle cx="3.5" cy="7.5" r=".6" fill="#fff" opacity=".7" />
               </pattern>
             </defs>
-            <path class="palm" d="M8 250c0-40 10-70 18-80h200c8 20 14 50 14 80v80H8z" />
+            <ellipse class="tip-shadow" cx="150" cy="182" rx="120" ry="8" />
             {
-              fingers.map((f, i) => (
-                <g class="finger" style={`--i: ${i}`} transform={`translate(${f.x} ${f.top})`}>
-                  <rect class="skin" width={f.w + 10} height={f.h} rx={(f.w + 10) / 2} x="-5" />
-                  <g transform="translate(0 8)">
-                    <path class="polish" d={nail(f.w, f.w * 1.35)} />
-                    <path class="chrome" d={nail(f.w, f.w * 1.35)} />
-                    <path class="glitter" d={nail(f.w, f.w * 1.35)} />
-                    <path class="shine" d={`M${f.w * 0.22} ${f.w * 0.95}V${f.w * 0.5}C${f.w * 0.22} ${f.w * 0.3} ${f.w * 0.32} ${f.w * 0.18} ${f.w * 0.42} ${f.w * 0.14}`} />
+              tips.map((t, i) => (
+                // Outer <g> carries the CSS animation; the inner one places and tilts the nail.
+                <g class="tip" style={`--i: ${i}`}>
+                  <g transform={`translate(${t.cx} 176) rotate(${t.tilt}) translate(${-t.w / 2} ${-t.h})`}>
+                    <path class="polish" d={nail(t.w, t.h)} />
+                    <path class="chrome" d={nail(t.w, t.h)} />
+                    <path class="glitter" d={nail(t.w, t.h)} />
+                    <path
+                      class="shine"
+                      d={`M${t.w * 0.27} ${t.h * 0.7}V${t.h * 0.42}C${t.w * 0.27} ${t.h * 0.24} ${t.w * 0.35} ${t.h * 0.13} ${t.w * 0.44} ${t.h * 0.08}`}
+                    />
                   </g>
                 </g>
               ))
             }
           </svg>
+          <p class="preview-label" aria-hidden="true">Press-on preview</p>
         </div>
       </section>
 
@@ -251,7 +262,8 @@ const reviews = [
 
           {
             groups.map((g, i) => (
-              <ul class="menu" role="tabpanel" id={`panel-${g.id}`} aria-labelledby={`tab-${g.id}`} hidden={i !== 0}>
+              <div role="tabpanel" id={`panel-${g.id}`} aria-labelledby={`tab-${g.id}`} hidden={i !== 0}>
+                <ul class="menu">
                 {treatments
                   .filter((t) => t.group === g.id)
                   .map((t, j) => (
@@ -266,7 +278,8 @@ const reviews = [
                       </p>
                     </li>
                   ))}
-              </ul>
+                </ul>
+              </div>
             ))
           }
         </div>
@@ -332,7 +345,7 @@ const reviews = [
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ---------- Try a shade ----------
-    const hand = document.querySelector<SVGElement>('[data-hand]');
+    const preview = document.querySelector<SVGElement>('[data-preview]');
     const shadeName = document.querySelector<HTMLElement>('[data-shade-name]');
     const swatches = document.querySelectorAll<HTMLButtonElement>('[data-shade]');
     const finishBtns = document.querySelectorAll<HTMLButtonElement>('[data-finish]');
@@ -340,16 +353,16 @@ const reviews = [
     swatches.forEach((btn) =>
       btn.addEventListener('click', () => {
         swatches.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-        hand?.style.setProperty('--shade', btn.dataset.shade ?? '');
+        preview?.style.setProperty('--shade', btn.dataset.shade ?? '');
         if (shadeName) shadeName.textContent = btn.dataset.name ?? '';
       }),
     );
     finishBtns.forEach((btn) =>
       btn.addEventListener('click', () => {
         finishBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-        if (!hand) return;
-        hand.classList.forEach((c) => c.startsWith('finish-') && hand.classList.remove(c));
-        hand.classList.add(`finish-${btn.dataset.finish}`);
+        if (!preview) return;
+        preview.classList.forEach((c) => c.startsWith('finish-') && preview.classList.remove(c));
+        preview.classList.add(`finish-${btn.dataset.finish}`);
       }),
     );
 
@@ -415,8 +428,6 @@ const reviews = [
     --berry: #a3284f;
     --gold: #c99a7a;
     --gold-light: #f1d9c3;
-    --skin: #e8b9a0;
-    --skin-shade: #d9a589;
     --serif: 'Playfair Display Variable', Georgia, serif;
     --sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
     --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
@@ -872,32 +883,53 @@ const reviews = [
     color: var(--cream);
   }
 
-  .hand-wrap {
+  .preview-wrap {
     position: relative;
     display: grid;
     place-items: center;
-    padding: 2rem 1rem 0;
+    gap: 1.25rem;
+    padding: clamp(2.5rem, 1.5rem + 3vw, 4rem) clamp(1rem, 0.5rem + 3vw, 3rem) 2rem;
     border-radius: 999px 999px 2rem 2rem;
-    background: linear-gradient(180deg, var(--blush), var(--cream));
-    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 35%, #fff 0, transparent 55%),
+      linear-gradient(180deg, var(--blush), var(--cream));
   }
-  .hand {
-    width: min(100%, 19rem);
+  /* Thin rose-gold line inside the arch, like the hero. */
+  .preview-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0.75rem;
+    border: 1px solid var(--gold);
+    border-radius: inherit;
+    opacity: 0.5;
+    pointer-events: none;
   }
-  .hand :is(.palm, .skin) {
-    fill: var(--skin);
+  .preview {
+    width: min(100%, 24rem);
+    overflow: visible;
   }
-  .hand .palm {
-    fill: var(--skin-shade);
+  .preview-label {
+    color: var(--plum-soft);
+    font-family: var(--serif);
+    font-style: italic;
   }
-  .finger {
-    animation: wave 0.8s var(--spring) both;
-    animation-delay: calc(var(--i) * 70ms + 0.2s);
+  .tip-shadow {
+    fill: var(--plum);
+    opacity: 0.08;
   }
-  @keyframes wave {
+  .tip {
+    filter: drop-shadow(0 6px 8px rgb(59 20 36 / 0.22));
+    transition: transform 0.4s var(--spring);
+    animation: tip-in 0.8s var(--spring) both;
+    animation-delay: calc(var(--i) * 80ms + 0.2s);
+  }
+  .preview:hover .tip {
+    transform: translateY(-4px);
+  }
+  @keyframes tip-in {
     from {
       opacity: 0;
-      transform: translateY(40px);
+      transform: translateY(30px);
     }
   }
   .polish {
@@ -991,9 +1023,6 @@ const reviews = [
     gap: 1.75rem;
     padding: 0;
     list-style: none;
-  }
-  .menu[hidden] {
-    display: none;
   }
   .menu li {
     animation: fade 0.6s var(--ease) both;
