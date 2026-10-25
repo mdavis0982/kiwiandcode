@@ -1,0 +1,269 @@
+/*
+ * Global styles: reset, base typography, section themes, buttons and the
+ * scroll-reveal animation. Component-specific styles live in each component.
+ */
+@import './tokens.css';
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  scroll-behavior: smooth;
+  /* Leave room for the sticky header when jumping to #sections. */
+  scroll-padding-top: 5rem;
+}
+body {
+  min-height: 100dvh;
+  background: var(--forest);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img,
+svg,
+picture {
+  display: block;
+  max-width: 100%;
+}
+a {
+  color: inherit;
+}
+button {
+  font: inherit;
+}
+
+/* Smooth cross-fade between pages (no JavaScript needed). */
+@view-transition {
+  navigation: auto;
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3,
+.wordmark {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 {
+  font-size: var(--step-4);
+}
+h2 {
+  font-size: var(--step-3);
+}
+h3 {
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+p {
+  text-wrap: pretty;
+}
+
+/* ---------- Section themes ---------- */
+/* Each section picks a theme; children use these variables for colour. */
+.theme-dark {
+  --bg: var(--forest);
+  --surface: var(--forest-raised);
+  --text: var(--paper);
+  --muted: var(--mist);
+  --accent: var(--kiwi);
+  --accent-text: var(--kiwi-light);
+  --line: var(--forest-line);
+  background: var(--bg);
+  color: var(--text);
+}
+.theme-light {
+  --bg: var(--cream);
+  --surface: var(--cream-raised);
+  --text: var(--forest);
+  --muted: var(--moss);
+  --accent: var(--kiwi-deep);
+  --accent-text: var(--kiwi-deep);
+  --line: var(--cream-line);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- Layout helpers ---------- */
+.container {
+  width: min(100% - 2 * var(--gutter), var(--max-width));
+  margin-inline: auto;
+}
+.section {
+  padding-block: var(--space-xl);
+  position: relative;
+}
+.section-head {
+  max-width: 40rem;
+  margin-bottom: var(--space-l);
+}
+.section-head p {
+  margin-top: var(--space-s);
+  color: var(--muted);
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+/* Small label above headings, styled like a code comment: // like this */
+.eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-s);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--accent-text);
+}
+.eyebrow::before {
+  content: '// ';
+  opacity: 0.7;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  --btn-bg: var(--kiwi);
+  --btn-text: var(--forest);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 3rem; /* comfortable tap target */
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--btn-bg);
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--step-0);
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s var(--ease-out),
+    background-color 0.2s,
+    color 0.2s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -10px rgb(140 198 63 / 0.6);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  transition: transform 0.25s var(--ease-spring);
+}
+.btn:hover svg {
+  transform: translateX(3px);
+}
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-text: var(--text);
+  border-color: currentColor;
+}
+.btn--ghost:hover {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+.theme-light .btn:not(.btn--ghost) {
+  --btn-bg: var(--forest);
+  --btn-text: var(--paper);
+}
+.theme-light .btn:not(.btn--ghost):hover {
+  box-shadow: 0 10px 24px -10px rgb(17 42 31 / 0.5);
+}
+
+/* Inline text links */
+.link {
+  color: var(--accent-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.link:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Accessibility ---------- */
+:focus-visible {
+  outline: 3px solid var(--kiwi);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.theme-light :focus-visible {
+  outline-color: var(--kiwi-deep);
+}
+.skip-link {
+  position: absolute;
+  left: var(--space-s);
+  top: -10rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-s);
+  background: var(--kiwi);
+  color: var(--forest);
+  font-weight: 600;
+}
+.skip-link:focus {
+  top: var(--space-s);
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Scroll reveal ---------- */
+/*
+ * Elements with [data-reveal] fade up as they scroll into view.
+ * The `js` class is added by a tiny script in BaseLayout, so without
+ * JavaScript (or with reduced motion) everything is simply visible.
+ * Use style="--delay: 120ms" to stagger items.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.8s var(--ease-out),
+      transform 0.8s var(--ease-out);
+    transition-delay: var(--delay, 0ms);
+  }
+  .js [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

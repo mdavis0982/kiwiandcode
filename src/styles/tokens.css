@@ -1,0 +1,51 @@
+/*
+ * Design tokens: the palette, type and spacing used across the site.
+ * Colours are sampled from the logo. Contrast notes are for text on background.
+ */
+:root {
+  /* ---- Palette ---- */
+  --forest: #112a1f; /* logo background; main dark */
+  --forest-raised: #173628; /* cards and bands on dark */
+  --forest-line: #24473a; /* hairlines on dark */
+  --kiwi: #8cc63f; /* brackets + flesh: accent on dark only (7.5:1 on forest) */
+  --kiwi-light: #c3e27f; /* inner ring: highlights on dark (10.6:1) */
+  --kiwi-deep: #3f6b12; /* links/accents on cream (5.6:1) */
+  --cream: #f4f2d8; /* kiwi core: light sections */
+  --cream-raised: #fbfaee; /* cards on cream */
+  --cream-line: #e2dfc0; /* hairlines on cream */
+  --paper: #f7f5ee; /* wordmark: text on dark (14:1) */
+  --mist: #c9cdbb; /* secondary text on dark (9.4:1) */
+  --moss: #4a5a50; /* secondary text on cream (6.6:1) */
+  --skin: #7d5733; /* kiwi rim: thin rules and small accents (5.7:1 on cream) */
+  --seed: #2a1b10; /* seeds: logo only */
+
+  /* ---- Type ---- */
+  --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Fluid sizes: min at 360px wide, max at 1280px wide. */
+  --step--1: clamp(0.875rem, 0.85rem + 0.1vw, 0.94rem);
+  --step-0: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.18rem + 0.3vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.35rem + 0.65vw, 1.95rem);
+  --step-3: clamp(1.9rem, 1.6rem + 1.3vw, 2.75rem);
+  --step-4: clamp(2.3rem, 1.75rem + 2.5vw, 3.9rem);
+
+  /* ---- Layout ---- */
+  --space-xs: 0.5rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: clamp(4rem, 3rem + 5vw, 7.5rem); /* vertical section padding */
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --max-width: 72rem;
+  --radius: 1rem;
+  --radius-s: 0.6rem;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --shadow: 0 1px 2px rgb(17 42 31 / 0.06), 0 12px 32px -12px rgb(17 42 31 / 0.25);
+}

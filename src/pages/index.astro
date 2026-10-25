@@ -1,0 +1,24 @@
+---
+/**
+ * Homepage. Each section is its own component in src/components/home/,
+ * so sections can be reordered, edited or reused independently.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Services from '../components/home/Services.astro';
+import WhyMe from '../components/home/WhyMe.astro';
+import Process from '../components/home/Process.astro';
+import About from '../components/home/About.astro';
+import ExamplesTeaser from '../components/home/ExamplesTeaser.astro';
+import ContactCta from '../components/home/ContactCta.astro';
+---
+
+<BaseLayout>
+  <Hero />
+  <Services />
+  <WhyMe />
+  <Process />
+  <About />
+  <ExamplesTeaser />
+  <ContactCta />
+</BaseLayout>

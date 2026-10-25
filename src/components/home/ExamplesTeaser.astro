@@ -1,0 +1,253 @@
+---
+/**
+ * Examples teaser: placeholder cards for the example homepages to come.
+ * They're labelled "Example design", never as client work.
+ *
+ * When the examples page exists, change `links.examples` in src/data/site.ts
+ * to '/examples/' and the "See all examples" link appears automatically.
+ */
+import { links } from '../../data/site';
+
+const examples = [
+  { kind: 'Café', note: 'Menu, opening hours and a map, front and centre.', accent: 'var(--skin)' },
+  { kind: 'Trades', note: 'Services, areas covered and a quick way to ask for a quote.', accent: 'var(--kiwi-deep)' },
+  { kind: 'Care provider', note: 'Warm, clear and easy for families to read.', accent: 'var(--forest)' },
+];
+
+// True once examples points at a real page instead of this section.
+const pageLive = !links.examples.startsWith('/#');
+---
+
+<section id="examples" class="section theme-light" aria-labelledby="examples-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Examples</p>
+      <h2 id="examples-title">Example sites are on the way</h2>
+      <p>
+        I'm building a set of example homepages for different kinds of local business, so you can see what yours could look
+        like.
+      </p>
+    </div>
+
+    <ul class="examples">
+      {
+        examples.map((ex, i) => (
+          <li class="example" data-reveal style={`--delay: ${i * 100}ms; --accent: ${ex.accent}`}>
+            {/* Mini browser window with a sketched page inside. Decorative only. */}
+            <div class="browser" aria-hidden="true">
+              <div class="browser-bar">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div class="page">
+                <div class="page-nav">
+                  <i class="logo" />
+                  <i class="links" />
+                </div>
+                <div class="page-hero">
+                  <i class="line line--lg" />
+                  <i class="line line--md" />
+                  <i class="pill" />
+                </div>
+                <div class="page-cards">
+                  <i />
+                  <i />
+                  <i />
+                </div>
+              </div>
+            </div>
+            <div class="example-body">
+              <p class="label">
+                Example design <span class="soon">Coming soon</span>
+              </p>
+              <h3>{ex.kind}</h3>
+              <p class="note">{ex.note}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      pageLive && (
+        <p class="all" data-reveal>
+          <a class="btn btn--ghost" href={links.examples}>
+            See all examples
+          </a>
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .examples {
+    display: grid;
+    gap: var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+  .example {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition:
+      transform 0.4s var(--ease-out),
+      box-shadow 0.4s var(--ease-out);
+  }
+  .example:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Mini browser ---------- */
+  .browser {
+    position: relative;
+    margin: var(--space-s) var(--space-s) 0;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 0.6rem 0.6rem 0 0;
+    background: #fff;
+    overflow: hidden;
+  }
+  /* Shimmer sweeping across, like a page that's still loading. */
+  .browser::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.7) 50%, transparent 70%);
+    transform: translateX(-100%);
+  }
+  .browser-bar {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--cream);
+  }
+  .browser-bar span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--cream-line);
+  }
+  .page {
+    padding: 0.75rem;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .example:hover .page {
+    transform: translateY(-6px);
+  }
+  .page i {
+    display: block;
+    border-radius: 0.25rem;
+  }
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+  }
+  .logo {
+    width: 1.4rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+  .links {
+    width: 3.5rem;
+    height: 0.4rem;
+    background: var(--cream-line);
+  }
+  .page-hero {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.9rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--accent) 14%, white);
+    margin-bottom: 0.6rem;
+  }
+  .line {
+    height: 0.5rem;
+    background: color-mix(in srgb, var(--accent) 70%, white);
+  }
+  .line--lg {
+    width: 75%;
+    height: 0.7rem;
+    background: var(--accent);
+  }
+  .line--md {
+    width: 55%;
+  }
+  .pill {
+    width: 2.8rem;
+    height: 0.8rem;
+    margin-top: 0.3rem;
+    border-radius: 999px !important;
+    background: var(--kiwi);
+  }
+  .page-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .page-cards i {
+    height: 2rem;
+    background: var(--cream);
+  }
+
+  /* ---------- Text ---------- */
+  .example-body {
+    padding: var(--space-m);
+    border-top: 1px solid var(--line);
+  }
+  .label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .soon {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: var(--forest);
+    color: var(--kiwi-light);
+    font-size: 0.75rem;
+  }
+  .note {
+    margin-top: 0.3rem;
+    color: var(--muted);
+  }
+  .all {
+    margin-top: var(--space-l);
+    text-align: center;
+  }
+
+  @media (min-width: 48rem) {
+    .examples {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .browser::after {
+      animation: shimmer 2.8s ease-in-out infinite;
+    }
+    .example:nth-child(2) .browser::after {
+      animation-delay: 0.4s;
+    }
+    .example:nth-child(3) .browser::after {
+      animation-delay: 0.8s;
+    }
+  }
+  @keyframes shimmer {
+    60%,
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>

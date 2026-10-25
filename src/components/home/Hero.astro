@@ -1,0 +1,354 @@
+---
+/**
+ * Hero: the first screen. Headline, short intro, two buttons and the
+ * animated kiwi mark. The headline words rise in one after another.
+ */
+import LogoMark from '../LogoMark.astro';
+import { links } from '../../data/site';
+
+// Headline split into words so each can animate in. Words in `highlight`
+// are shown in kiwi green.
+const headline = 'Clean, affordable websites for local businesses.';
+const highlight = ['local', 'businesses.'];
+const words = headline.split(' ');
+
+const perks = ['Free quotes', 'Demos on a quick turnaround', 'You own your site'];
+---
+
+<section class="hero theme-dark" aria-labelledby="hero-title">
+  <!-- Decorative background: soft moving glow and a faint dot grid. -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="glow glow--one"></div>
+    <div class="glow glow--two"></div>
+    <div class="grid"></div>
+  </div>
+
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow hero-fade" style="--d: 0ms">Web design in County Down, Northern Ireland</p>
+
+      <h1 id="hero-title">
+        {
+          words.map((word, i) => (
+            <span class:list={['word', { 'is-highlight': highlight.includes(word) }]} style={`--d: ${120 + i * 70}ms`}>
+              {word}
+            </span>
+          ))
+        }
+      </h1>
+
+      <p class="lead hero-fade" style="--d: 650ms">
+        I'm Marcus, a web developer based in County Down. I build fast, good-looking websites for trades, caf&eacute;s,
+        bakeries, care providers and local services, without agency prices or agency jargon.
+      </p>
+
+      <div class="actions hero-fade" style="--d: 780ms">
+        <a class="btn" href={links.contact}>
+          Get in touch
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
+            ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            ></path></svg
+          >
+        </a>
+        <a class="btn btn--ghost" href={links.examples}>See examples</a>
+      </div>
+
+      <ul class="perks hero-fade" style="--d: 900ms">
+        {
+          perks.map((perk) => (
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="m5 10.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              {perk}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="hero-art">
+      <div class="art-halo" aria-hidden="true"></div>
+      <LogoMark animated class="hero-mark" />
+      <!-- Little "code" labels floating around the mark, purely decorative. -->
+      <span class="tag tag--one" aria-hidden="true">&lt;header&gt;</span>
+      <span class="tag tag--two" aria-hidden="true">display: grid;</span>
+      <span class="tag tag--three" aria-hidden="true">fast &amp;&amp; local</span>
+    </div>
+  </div>
+
+  <a class="scroll-cue" href="#services" aria-label="Scroll to services">
+    <span aria-hidden="true"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    /* Clip sideways only, so the glow can spread up behind the see-through header. */
+    overflow-x: clip;
+    padding-top: var(--space-l);
+    padding-bottom: var(--space-xl);
+    isolation: isolate;
+  }
+
+  /* ---------- Background ---------- */
+  .hero-bg {
+    position: absolute;
+    inset: -8rem 0 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+  }
+  .glow--one {
+    width: 38rem;
+    height: 38rem;
+    right: -12rem;
+    top: -6rem;
+    background: radial-gradient(circle, var(--kiwi) 0%, transparent 65%);
+  }
+  .glow--two {
+    width: 28rem;
+    height: 28rem;
+    left: -10rem;
+    bottom: -10rem;
+    background: radial-gradient(circle, var(--skin) 0%, transparent 70%);
+    opacity: 0.3;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(247 245 238 / 0.09) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 20%, transparent 75%);
+  }
+
+  /* ---------- Layout ---------- */
+  .hero-inner {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+  }
+  .hero-copy {
+    max-width: 38rem;
+  }
+  h1 {
+    margin-bottom: var(--space-m);
+  }
+  .word {
+    display: inline-block;
+    margin-right: 0.25em;
+  }
+  .is-highlight {
+    color: var(--kiwi);
+  }
+  .lead {
+    color: var(--mist);
+    font-size: var(--step-1);
+    line-height: 1.55;
+    max-width: 34rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+  .perks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-m);
+    margin-top: var(--space-l);
+    padding: 0;
+    list-style: none;
+    font-size: var(--step--1);
+    color: var(--mist);
+  }
+  .perks li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .perks svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--kiwi);
+  }
+
+  /* ---------- Art ---------- */
+  .hero-art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: var(--space-m);
+  }
+  .hero-art :global(.hero-mark) {
+    width: min(100%, 30rem);
+    height: auto;
+    filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.35));
+  }
+  .art-halo {
+    position: absolute;
+    width: 62%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px dashed rgb(195 226 127 / 0.25);
+  }
+  .tag {
+    position: absolute;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--forest-line);
+    border-radius: 0.5rem;
+    background: rgb(23 54 40 / 0.85);
+    backdrop-filter: blur(6px);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--kiwi-light);
+    white-space: nowrap;
+    box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.5);
+  }
+  .tag--one {
+    top: 4%;
+    left: 6%;
+  }
+  .tag--two {
+    bottom: 10%;
+    right: 0;
+  }
+  .tag--three {
+    bottom: 2%;
+    left: 14%;
+  }
+
+  /* ---------- Scroll cue ---------- */
+  .scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    translate: -50% 0;
+    display: none;
+    width: 1.6rem;
+    height: 2.6rem;
+    border: 2px solid var(--mist);
+    border-radius: 1rem;
+    opacity: 0.7;
+  }
+  .scroll-cue span {
+    position: absolute;
+    left: 50%;
+    top: 0.45rem;
+    width: 4px;
+    height: 8px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: var(--kiwi);
+  }
+
+  @media (min-width: 56rem) {
+    .hero {
+      min-height: min(100svh, 56rem);
+      display: flex;
+      align-items: center;
+    }
+    .hero-inner {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: var(--space-xl);
+    }
+    .scroll-cue {
+      display: block;
+    }
+  }
+
+  /* ---------- Motion ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .word,
+    .hero-fade {
+      animation: rise 0.9s var(--ease-out) var(--d) both;
+    }
+    .glow--one {
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .glow--two {
+      animation: drift 22s ease-in-out -6s infinite alternate-reverse;
+    }
+    .art-halo {
+      animation:
+        fade-in 1s ease 1s both,
+        spin 60s linear infinite;
+    }
+    .tag {
+      animation:
+        tag-in 0.7s var(--ease-spring) both,
+        float 6s ease-in-out infinite;
+    }
+    .tag--one {
+      animation-delay: 1.3s, 2s;
+    }
+    .tag--two {
+      animation-delay: 1.5s, 3s;
+    }
+    .tag--three {
+      animation-delay: 1.7s, 1s;
+    }
+    .scroll-cue span {
+      animation: scroll-dot 2s ease-in-out infinite;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.6em);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+  @keyframes drift {
+    to {
+      transform: translate(-4rem, 3rem) scale(1.15);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+  @keyframes tag-in {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+  @keyframes float {
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes scroll-dot {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+</style>

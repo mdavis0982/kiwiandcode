@@ -1,0 +1,133 @@
+---
+/**
+ * Why work with me: four concrete reasons. The heading stays pinned on the
+ * left on wide screens while the reasons scroll past on the right.
+ */
+const reasons = [
+  {
+    title: 'Local to you',
+    text: "I'm based in County Down and work with businesses right across the area. Further afield? That's no problem either.",
+  },
+  {
+    title: 'You deal with me',
+    text: "No account managers, no handoffs and no jargon. The person you talk to is the person building your site, and I'll explain things in plain English.",
+  },
+  {
+    title: 'Honest pricing',
+    text: "Quotes are free, and there's nothing to pay until we've agreed a plan together. Then it's 50% up front, with no surprise extras along the way.",
+  },
+  {
+    title: 'See it quickly',
+    text: "Every site starts from a solid, tested base that I tailor to you, so demos are available on a quick turnaround and you're not paying for months of work.",
+  },
+];
+---
+
+<section id="why" class="section theme-dark why" aria-labelledby="why-title">
+  <div class="container why-inner">
+    <div class="why-head" data-reveal>
+      <p class="eyebrow">Why work with me</p>
+      <h2 id="why-title">A real person, a fair price and a site you'll be proud of</h2>
+      <p class="sub">Good, honest work without the agency price tag.</p>
+    </div>
+
+    <ol class="reasons">
+      {
+        reasons.map((reason, i) => (
+          <li class="reason" data-reveal style={`--delay: ${i * 80}ms`}>
+            <span class="num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h3>{reason.title}</h3>
+              <p>{reason.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .why {
+    overflow: clip;
+  }
+  /* Faint oversized brackets in the background. */
+  .why::before,
+  .why::after {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(14rem, 30vw, 28rem);
+    line-height: 1;
+    color: var(--forest-raised);
+    pointer-events: none;
+  }
+  .why::before {
+    content: '<';
+    left: -0.2em;
+  }
+  .why::after {
+    content: '>';
+    right: -0.2em;
+  }
+
+  .why-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-l);
+  }
+  .sub {
+    margin-top: var(--space-s);
+    font-size: var(--step-1);
+    color: var(--mist);
+  }
+
+  .reasons {
+    display: grid;
+    padding: 0;
+    list-style: none;
+  }
+  .reason {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-m);
+    padding-block: var(--space-m);
+    border-top: 1px solid var(--line);
+  }
+  .reason:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--kiwi);
+    padding-top: 0.3rem;
+  }
+  .reason h3 {
+    margin-bottom: 0.35rem;
+    transition: color 0.3s;
+  }
+  .reason:hover h3 {
+    color: var(--kiwi-light);
+  }
+  .reason p {
+    color: var(--mist);
+  }
+
+  @media (min-width: 56rem) {
+    .why-inner {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+    .why-head {
+      position: sticky;
+      top: 8rem;
+    }
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+/**
+ * Sticky site header: logo + wordmark, nav links and the main call to action.
+ * On small screens the nav links drop to a second row, so no menu
+ * button or JavaScript is needed.
+ */
+import LogoMark from './LogoMark.astro';
+import { links, nav, site } from '../data/site';
+---
+
+<header class="site-header theme-dark">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+      <LogoMark class="brand-mark" />
+      <span class="wordmark">Kiwi <span class="and">and</span> Code</span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a class="btn header-cta" href={links.contact}>Get in touch</a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color 0.3s,
+      border-color 0.3s,
+      backdrop-filter 0.3s;
+  }
+  /* .is-scrolled is toggled by the script in BaseLayout. */
+  .site-header:global(.is-scrolled) {
+    background: rgb(17 42 31 / 0.82);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--forest-line);
+  }
+
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem var(--space-m);
+    padding-block: 0.75rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--paper);
+  }
+  .brand :global(.brand-mark) {
+    width: 3.1rem;
+    height: auto;
+  }
+  .wordmark {
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .and {
+    font-weight: 600;
+    color: var(--kiwi-light);
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+  }
+  .nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+  .nav a {
+    position: relative;
+    display: inline-block;
+    padding-block: 0.6rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--mist);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  /* Underline that grows from the left on hover. */
+  .nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.35rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--kiwi);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease-out);
+  }
+  .nav a:hover {
+    color: var(--paper);
+  }
+  .nav a:hover::after {
+    transform: scaleX(1);
+  }
+
+  .header-cta {
+    min-height: 2.75rem;
+    padding: 0.5rem 1.1rem;
+    font-size: var(--step--1);
+  }
+
+  @media (min-width: 52rem) {
+    .header-inner {
+      flex-wrap: nowrap;
+      padding-block: 1rem;
+    }
+    .nav {
+      order: 0;
+      width: auto;
+      margin-left: auto;
+    }
+    .nav ul {
+      gap: 2rem;
+    }
+    .nav a {
+      font-size: var(--step-0);
+    }
+    .header-cta {
+      font-size: var(--step-0);
+      padding-inline: 1.4rem;
+    }
+  }
+
+  @media (max-width: 22rem) {
+    .wordmark {
+      font-size: 1.05rem;
+    }
+    .brand :global(.brand-mark) {
+      width: 2.6rem;
+    }
+  }
+</style>

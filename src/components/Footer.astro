@@ -1,0 +1,134 @@
+---
+/**
+ * Site footer: brand, contact details, location and copyright.
+ */
+import LogoMark from './LogoMark.astro';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer theme-dark">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href="/" aria-label={`${site.name}, home`}>
+        <LogoMark class="brand-mark" />
+        <span class="wordmark">Kiwi and Code</span>
+      </a>
+      <p>Clean, affordable websites for local businesses.</p>
+    </div>
+
+    <ul class="footer-details">
+      <li>
+        <span class="label">Email</span>
+        <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+      </li>
+      <li>
+        <span class="label">Based in</span>
+        {site.area}
+      </li>
+      <li>
+        <span class="label">Instagram</span>
+        {
+          site.instagram ? (
+            <a class="link" href={site.instagram} rel="me">
+              @kiwiandcode
+            </a>
+          ) : (
+            // Placeholder until the account exists: set `instagram` in src/data/site.ts.
+            <span class="soon">Coming soon</span>
+          )
+        }
+      </li>
+    </ul>
+  </div>
+
+  <div class="container footer-base">
+    <p>&copy; {year} {site.name}. Built by {site.owner} in County Down.</p>
+    <p class="code-sign" aria-hidden="true">&lt;/&gt; with kiwi</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--forest-line);
+    padding-top: var(--space-l);
+    padding-bottom: var(--space-m);
+  }
+  .footer-inner {
+    display: grid;
+    gap: var(--space-l);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--paper);
+  }
+  .brand :global(.brand-mark) {
+    width: 3rem;
+  }
+  .wordmark {
+    font-size: 1.15rem;
+  }
+  .footer-brand p {
+    margin-top: var(--space-s);
+    color: var(--mist);
+    max-width: 22rem;
+  }
+  .footer-details {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+  .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--mist);
+  }
+  .link {
+    display: inline-block;
+    padding-block: 0.25rem;
+    overflow-wrap: anywhere;
+  }
+  @media (min-width: 48rem) {
+    .link {
+      overflow-wrap: normal;
+      white-space: nowrap;
+    }
+  }
+  .soon {
+    color: var(--mist);
+    font-style: italic;
+  }
+  .footer-base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--forest-line);
+    font-size: var(--step--1);
+    color: var(--mist);
+  }
+  .code-sign {
+    font-family: var(--font-mono);
+    color: var(--kiwi);
+  }
+
+  @media (min-width: 48rem) {
+    .footer-inner {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+    .footer-details {
+      grid-template-columns: repeat(3, auto);
+      justify-content: end;
+      gap: var(--space-l);
+    }
+  }
+</style>

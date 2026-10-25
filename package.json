@@ -1,0 +1,22 @@
+{
+  "name": "kiwiandcode",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for Kiwi and Code: clean, affordable websites for local businesses in Northern Ireland.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
+    "astro": "^7.4.1"
+  }
+}

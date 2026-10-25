@@ -1,0 +1,183 @@
+---
+/**
+ * About me: short personal story with a photo placeholder.
+ *
+ * To add your photo:
+ *  1. Save it as src/assets/marcus.jpg (portrait, at least 800px wide).
+ *  2. Uncomment the two Image lines below and delete the .photo-placeholder div.
+ * Astro will resize and compress it automatically.
+ */
+// import { Image } from 'astro:assets';
+// import marcusPhoto from '../../assets/marcus.jpg';
+---
+
+<section id="about" class="section theme-dark about" aria-labelledby="about-title">
+  <div class="container about-inner">
+    <div class="photo-wrap" data-reveal>
+      <div class="photo-frame">
+        {/* <Image src={marcusPhoto} alt="Marcus Davis, founder of Kiwi and Code" width={640} class="photo" /> */}
+        <div class="photo-placeholder" role="img" aria-label="Placeholder for a photo of Marcus">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+          </svg>
+          <span>Photo of Marcus<br />coming soon</span>
+        </div>
+      </div>
+
+      <!-- Decorative "code" card: repeats the story below, so hidden from screen readers. -->
+      <pre class="code-card" aria-hidden="true"><code><span class="k">const</span> <span class="v">marcus</span> = &#123;
+  born: <span class="s">"New Zealand"</span>,
+  grewUp: <span class="s">"Crossgar, Co. Down"</span>,
+  studied: <span class="s">"Computing &amp; IT, Queen's"</span>,
+  building: <span class="s">"Kiwi and Code"</span>,
+&#125;;</code></pre>
+    </div>
+
+    <div class="about-copy" data-reveal style="--delay: 120ms">
+      <p class="eyebrow">About me</p>
+      <h2 id="about-title">Kia ora, I'm Marcus.</h2>
+      <p>
+        I was born in New Zealand and grew up in Crossgar, County Down. That's where the &ldquo;Kiwi&rdquo; in Kiwi and Code
+        comes from.
+      </p>
+      <p>
+        I studied Computing and Information Technology at Queen's University Belfast and now work full-time in tech. Kiwi
+        and Code is my own business alongside that, set up to help local businesses look as good online as they are in
+        person.
+      </p>
+      <p>
+        When you work with me you get one person who knows your project inside out, explains things simply and genuinely
+        cares about getting it right for you.
+      </p>
+      <p class="signoff">Marcus Davis</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-inner {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  /* ---------- Photo ---------- */
+  .photo-wrap {
+    position: relative;
+    max-width: 24rem;
+    margin-inline: auto;
+    width: 100%;
+    padding-bottom: 3rem;
+  }
+  .photo-frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background: var(--forest-raised);
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+  /* Offset kiwi outline behind the photo. */
+  .photo-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -0.9rem 0.9rem 3.9rem -0.9rem;
+    border: 2px solid var(--kiwi);
+    border-radius: 1.5rem;
+    opacity: 0.5;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .photo-wrap:hover::before {
+    transform: translate(0.5rem, 0.5rem);
+  }
+  .photo-frame :global(.photo) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-placeholder {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-s);
+    height: 100%;
+    border: 2px dashed var(--forest-line);
+    border-radius: inherit;
+    color: var(--mist);
+    text-align: center;
+    font-size: var(--step--1);
+  }
+  .photo-placeholder svg {
+    width: 4rem;
+    height: 4rem;
+    fill: none;
+    stroke: var(--kiwi);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .code-card {
+    position: absolute;
+    right: -0.5rem;
+    bottom: 0;
+    max-width: calc(100% + 0.5rem);
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--forest-line);
+    border-radius: var(--radius-s);
+    background: rgb(17 42 31 / 0.92);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.7);
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 0.6rem + 0.35vw, 0.8rem);
+    line-height: 1.6;
+    color: var(--paper);
+    overflow-x: auto;
+  }
+  .k {
+    color: var(--kiwi);
+  }
+  .v {
+    color: var(--kiwi-light);
+  }
+  .s {
+    color: #e9c9a0; /* warm kiwi-skin tint, 10:1 on forest */
+  }
+
+  /* ---------- Copy ---------- */
+  .about-copy {
+    max-width: 36rem;
+  }
+  .about-copy h2 {
+    margin-bottom: var(--space-m);
+  }
+  .about-copy p:not(.eyebrow) {
+    color: var(--mist);
+    margin-bottom: var(--space-s);
+  }
+  .about-copy p.signoff {
+    margin-top: var(--space-m);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--step-1);
+    color: var(--paper);
+  }
+  .signoff::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2px;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    background: var(--kiwi);
+  }
+
+  @media (min-width: 56rem) {
+    .about-inner {
+      grid-template-columns: 0.85fr 1.15fr;
+    }
+    .code-card {
+      right: -2.5rem;
+    }
+  }
+</style>
