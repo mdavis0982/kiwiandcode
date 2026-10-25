@@ -1,17 +1,15 @@
 /**
  * Builds /favicon.svg at build time from the same geometry as the header logo.
- * A rounded forest-green square keeps the mark readable on light and dark tabs.
+ * A rounded ink square keeps the mark readable on light and dark tabs, and
+ * shows through the slash between the two halves.
  */
 import type { APIRoute } from 'astro';
-import { brackets, colors, sliceMarkup } from '../lib/kiwiMark';
+import { colors, markMarkup } from '../lib/kiwiMark';
 
 export const GET: APIRoute = () => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="160 70 760 760">
-<rect x="160" y="70" width="760" height="760" rx="150" fill="${colors.forest}"/>
-<g fill="none" stroke="${colors.kiwi}" stroke-width="${brackets.width + 8}" stroke-linecap="round" stroke-linejoin="round">
-<path d="${brackets.left}"/><path d="${brackets.right}"/>
-</g>
-${sliceMarkup()}
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<rect width="120" height="120" rx="26" fill="${colors.ink}"/>
+<g transform="translate(60 60) scale(1.12) translate(-60 -60)">${markMarkup('fav')}</g>
 </svg>`;
 
   return new Response(svg, { headers: { 'Content-Type': 'image/svg+xml' } });

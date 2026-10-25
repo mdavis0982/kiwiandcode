@@ -72,12 +72,12 @@ import { site } from '../../data/site';
     position: relative;
     overflow: hidden;
     padding: var(--space-xl) var(--space-m);
-    border: 1px solid var(--forest-line);
+    border: 1px solid var(--ink-line);
     border-radius: 2rem;
     background:
-      radial-gradient(ellipse 70% 90% at 100% 0%, rgb(140 198 63 / 0.22), transparent 60%),
-      radial-gradient(ellipse 60% 70% at 0% 100%, rgb(125 87 51 / 0.25), transparent 60%),
-      var(--forest-raised);
+      radial-gradient(ellipse 70% 90% at 100% 0%, rgb(155 225 93 / 0.22), transparent 60%),
+      radial-gradient(ellipse 60% 70% at 0% 100%, rgb(255 122 89 / 0.25), transparent 60%),
+      var(--ink-raised);
     isolation: isolate;
   }
 
@@ -90,7 +90,7 @@ import { site } from '../../data/site';
     opacity: 0.18;
     z-index: -1;
   }
-  .panel-art :global(.panel-mark .km-slice) {
+  .panel-art :global(.panel-mark .km-mark) {
     transform-box: fill-box;
     transform-origin: center;
   }
@@ -123,10 +123,10 @@ import { site } from '../../data/site';
     min-height: 3.5rem;
     max-width: 100%;
     padding: 0.5rem 0.5rem 0.5rem 1.1rem;
-    border: 1px solid var(--forest-line);
+    border: 1px solid var(--ink-line);
     border-radius: 999px;
-    background: rgb(17 42 31 / 0.6);
-    color: var(--paper);
+    background: rgb(13 27 20 / 0.6);
+    color: var(--chalk);
     cursor: pointer;
     transition: border-color 0.2s;
   }
@@ -141,7 +141,7 @@ import { site } from '../../data/site';
   .copy-hint {
     padding: 0.45rem 0.9rem;
     border-radius: 999px;
-    background: var(--forest-line);
+    background: var(--ink-line);
     font-size: var(--step--1);
     font-weight: 600;
     transition:
@@ -150,7 +150,7 @@ import { site } from '../../data/site';
   }
   .copy:global(.is-copied) .copy-hint {
     background: var(--kiwi);
-    color: var(--forest);
+    color: var(--ink);
   }
   .copy-status {
     min-height: 1.5em;
@@ -174,7 +174,7 @@ import { site } from '../../data/site';
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .panel-art :global(.panel-mark .km-slice) {
+    .panel-art :global(.panel-mark .km-mark) {
       animation: turn 40s linear infinite;
     }
   }

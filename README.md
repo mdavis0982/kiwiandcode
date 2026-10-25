@@ -19,13 +19,14 @@ The dev server reloads as you edit. Other commands:
 | ----------------- | ----------------------------------------------- |
 | `npm run build`   | Builds the finished site into `dist/`           |
 | `npm run preview` | Serves the built `dist/` folder to check it     |
+| `npm run icons`   | Redraws the PNG icons in `public/` from the logo |
 
 ## Where things live
 
 ```text
 public/                     copied to the site as-is
   og-image.png              1200×630 image for social shares
-  logo-instagram.png        original 1080×1080 logo
+  logo-square.png           1080×1080 logo for Instagram and other profiles
   apple-touch-icon.png      home-screen icon for iPhones
   robots.txt, _headers      search engine and Cloudflare settings
 src/
@@ -33,7 +34,7 @@ src/
   styles/tokens.css         colours, fonts, sizes (the design system)
   styles/global.css         base styles, buttons, section themes, animations
   layouts/BaseLayout.astro  <head>, SEO tags, header, footer, shared scripts
-  lib/kiwiMark.ts           geometry of the kiwi logo mark
+  lib/kiwiMark.ts           geometry of the logo mark (kiwi slice cut by a "/")
   components/
     LogoMark.astro          the logo mark as SVG (header, hero, footer)
     Header.astro, Footer.astro
@@ -41,6 +42,9 @@ src/
   pages/
     index.astro             the homepage
     favicon.svg.ts          builds /favicon.svg from the logo geometry
+    examples/               example sites (bakery, personal trainer)
+scripts/
+  make-icons.mjs            renders the PNG icons (needs Google Chrome)
 ```
 
 ## Common edits

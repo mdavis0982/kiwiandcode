@@ -1,7 +1,7 @@
 ---
 /**
  * Hero: the first screen. Headline, short intro, two buttons and the
- * animated kiwi mark. The headline words rise in one after another.
+ * animated kiwi mark (the two halves slide together along the cut). The headline words rise in one after another.
  */
 import LogoMark from '../LogoMark.astro';
 import { links } from '../../data/site';
@@ -117,13 +117,13 @@ const perks = ['Free quotes', 'Demos on a quick turnaround', 'You own your site'
     height: 28rem;
     left: -10rem;
     bottom: -10rem;
-    background: radial-gradient(circle, var(--skin) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--coral) 0%, transparent 70%);
     opacity: 0.3;
   }
   .grid {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgb(247 245 238 / 0.09) 1px, transparent 1px);
+    background-image: radial-gradient(rgb(245 243 234 / 0.09) 1px, transparent 1px);
     background-size: 28px 28px;
     mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 20%, transparent 75%);
   }
@@ -188,27 +188,27 @@ const perks = ['Free quotes', 'Demos on a quick turnaround', 'You own your site'
     padding-block: var(--space-m);
   }
   .hero-art :global(.hero-mark) {
-    width: min(100%, 30rem);
+    width: min(78%, 25rem);
     height: auto;
     filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.35));
   }
   .art-halo {
     position: absolute;
-    width: 62%;
+    width: min(100%, 31rem);
     aspect-ratio: 1;
     border-radius: 50%;
-    border: 1px dashed rgb(195 226 127 / 0.25);
+    border: 1px dashed rgb(212 245 168 / 0.25);
   }
   .tag {
     position: absolute;
     padding: 0.3rem 0.65rem;
-    border: 1px solid var(--forest-line);
+    border: 1px solid var(--ink-line);
     border-radius: 0.5rem;
-    background: rgb(23 54 40 / 0.85);
+    background: rgb(20 37 25 / 0.85);
     backdrop-filter: blur(6px);
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    color: var(--kiwi-light);
+    color: var(--lime);
     white-space: nowrap;
     box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.5);
   }

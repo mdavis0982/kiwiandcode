@@ -1,26 +1,27 @@
 /*
  * Design tokens: the palette, type and spacing used across the site.
- * Colours are sampled from the logo. Contrast notes are for text on background.
+ * Colours come from the kiwi-slice mark. Contrast notes are for text on background.
  */
 :root {
   /* ---- Palette ---- */
-  --forest: #112a1f; /* logo background; main dark */
-  --forest-raised: #173628; /* cards and bands on dark */
-  --forest-line: #24473a; /* hairlines on dark */
-  --kiwi: #8cc63f; /* brackets + flesh: accent on dark only (7.5:1 on forest) */
-  --kiwi-light: #c3e27f; /* inner ring: highlights on dark (10.6:1) */
-  --kiwi-deep: #3f6b12; /* links/accents on cream (5.6:1) */
-  --cream: #f4f2d8; /* kiwi core: light sections */
-  --cream-raised: #fbfaee; /* cards on cream */
-  --cream-line: #e2dfc0; /* hairlines on cream */
-  --paper: #f7f5ee; /* wordmark: text on dark (14:1) */
-  --mist: #c9cdbb; /* secondary text on dark (9.4:1) */
-  --moss: #4a5a50; /* secondary text on cream (6.6:1) */
-  --skin: #7d5733; /* kiwi rim: thin rules and small accents (5.7:1 on cream) */
-  --seed: #2a1b10; /* seeds: logo only */
+  --ink: #0d1b14; /* main dark */
+  --ink-raised: #142519; /* cards and bands on dark */
+  --ink-line: #26392e; /* hairlines on dark */
+  --kiwi: #9be15d; /* kiwi flesh: accent on dark only (11.3:1 on ink) */
+  --lime: #d4f5a8; /* inner ring: highlights on dark (14.7:1) */
+  --leaf: #3a6a12; /* links/accents on paper (6:1) */
+  --paper: #faf7ec; /* kiwi core: light sections */
+  --paper-raised: #fffdf7; /* cards on paper */
+  --paper-line: #e6e1cc; /* hairlines on paper */
+  --chalk: #f5f3ea; /* text on dark (16:1) */
+  --mist: #b4bfb7; /* secondary text on dark (9.4:1) */
+  --stone: #525a53; /* secondary text on paper (6.6:1) */
+  --coral: #ff7a59; /* warm accent on dark (6.9:1) and glows */
+  --coral-deep: #b23e1b; /* warm accent on paper (5.4:1) */
+  --peach: #ffb59e; /* code strings on dark (10.4:1) */
 
   /* ---- Type ---- */
-  --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -47,5 +48,5 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  --shadow: 0 1px 2px rgb(17 42 31 / 0.06), 0 12px 32px -12px rgb(17 42 31 / 0.25);
+  --shadow: 0 1px 2px rgb(13 27 20 / 0.06), 0 12px 32px -12px rgb(13 27 20 / 0.25);
 }

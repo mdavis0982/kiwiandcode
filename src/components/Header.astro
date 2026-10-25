@@ -45,10 +45,10 @@ import { links, nav, site } from '../data/site';
   }
   /* .is-scrolled is toggled by the script in BaseLayout. */
   .site-header:global(.is-scrolled) {
-    background: rgb(17 42 31 / 0.82);
+    background: rgb(13 27 20 / 0.82);
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
-    border-bottom-color: var(--forest-line);
+    border-bottom-color: var(--ink-line);
   }
 
   .header-inner {
@@ -65,10 +65,10 @@ import { links, nav, site } from '../data/site';
     align-items: center;
     gap: 0.6rem;
     text-decoration: none;
-    color: var(--paper);
+    color: var(--chalk);
   }
   .brand :global(.brand-mark) {
-    width: 3.1rem;
+    width: 2.5rem;
     height: auto;
   }
   .wordmark {
@@ -78,7 +78,7 @@ import { links, nav, site } from '../data/site';
   }
   .and {
     font-weight: 600;
-    color: var(--kiwi-light);
+    color: var(--lime);
   }
 
   .nav {
@@ -117,7 +117,7 @@ import { links, nav, site } from '../data/site';
     transition: transform 0.3s var(--ease-out);
   }
   .nav a:hover {
-    color: var(--paper);
+    color: var(--chalk);
   }
   .nav a:hover::after {
     transform: scaleX(1);
@@ -156,7 +156,7 @@ import { links, nav, site } from '../data/site';
       font-size: 1.05rem;
     }
     .brand :global(.brand-mark) {
-      width: 2.6rem;
+      width: 2.2rem;
     }
   }
 </style>

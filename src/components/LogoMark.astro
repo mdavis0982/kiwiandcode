@@ -1,6 +1,6 @@
 ---
 /**
- * The Kiwi and Code mark (kiwi slice between < > brackets) as inline SVG.
+ * The Kiwi and Code mark (a kiwi slice cut in two by a "/") as inline SVG.
  *
  * Props:
  *  - animated: plays the intro animation (used once, in the hero).
@@ -8,7 +8,7 @@
  *              "Kiwi and Code" wordmark, so screen readers don't hear it twice.
  *  - class:    extra classes for sizing from the parent.
  */
-import { brackets, center, colors, radius, rays, seeds, viewBox } from '../lib/kiwiMark';
+import { center, colors, cut, radius, seeds, seedSize, viewBox } from '../lib/kiwiMark';
 
 interface Props {
   animated?: boolean;
@@ -18,6 +18,14 @@ interface Props {
 
 const { animated = false, label = '', class: className = '' } = Astro.props;
 const { x, y } = center;
+const { x: dx, y: dy } = cut.offset;
+
+// The mark appears several times per page, so each copy needs its own clip ids.
+const uid = `km-${Math.random().toString(36).slice(2, 8)}`;
+const halves = [
+  { key: 'a', clip: `${uid}-l`, points: cut.left, shift: `translate(${-dx} ${-dy})` },
+  { key: 'b', clip: `${uid}-r`, points: cut.right, shift: `translate(${dx} ${dy})` },
+];
 ---
 
 <svg
@@ -29,36 +37,43 @@ const { x, y } = center;
   aria-hidden={label ? undefined : 'true'}
   focusable="false"
 >
-  <g
-    class="km-brackets"
-    fill="none"
-    stroke={colors.kiwi}
-    stroke-width={brackets.width}
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  >
-    <path class="km-bracket km-bracket--left" d={brackets.left} />
-    <path class="km-bracket km-bracket--right" d={brackets.right} />
-  </g>
+  <defs>
+    {
+      halves.map((h) => (
+        <clipPath id={h.clip}>
+          <polygon points={h.points} />
+        </clipPath>
+      ))
+    }
+  </defs>
 
-  <g class="km-slice">
-    <circle cx={x} cy={y} r={radius.skin} fill={colors.skin} />
-    <circle cx={x} cy={y} r={radius.flesh} fill={colors.kiwi} />
-    <g class="km-rays" stroke={colors.ray} stroke-width="5" stroke-linecap="round">
-      {rays.map((r) => <line x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} />)}
-    </g>
-    <circle class="km-ring" cx={x} cy={y} r={radius.ring} fill={colors.ring} />
-    <circle class="km-core" cx={x} cy={y} r={radius.core} fill={colors.core} />
-    <g fill={colors.seed}>
-      {
-        seeds.map((s, i) => (
-          // Wrapper <g> carries the CSS animation; the ellipse keeps its own rotation.
-          <g class="km-seed" style={`--i:${i}`}>
-            <ellipse cx={s.cx} cy={s.cy} rx="7" ry="12" transform={`rotate(${s.rotate} ${s.cx} ${s.cy})`} />
+  <g class="km-mark">
+    {
+      halves.map((h) => (
+        // Outer <g> carries the CSS animation; the inner one keeps the clip and gap offset.
+        <g class={`km-half km-half--${h.key}`}>
+          <g clip-path={`url(#${h.clip})`} transform={h.shift}>
+            <circle cx={x} cy={y} r={radius.skin} fill={colors.skin} />
+            <circle cx={x} cy={y} r={radius.flesh} fill={colors.kiwi} />
+            <circle class="km-ring" cx={x} cy={y} r={radius.ring} fill={colors.lime} />
+            <circle class="km-core" cx={x} cy={y} r={radius.core} fill={colors.paper} />
+            <g fill={colors.ink}>
+              {seeds.map((s, i) => (
+                <g class="km-seed" style={`--i:${i}`}>
+                  <ellipse
+                    cx={s.cx}
+                    cy={s.cy}
+                    rx={seedSize.rx}
+                    ry={seedSize.ry}
+                    transform={`rotate(${s.rotate} ${s.cx} ${s.cy})`}
+                  />
+                </g>
+              ))}
+            </g>
           </g>
-        ))
-      }
-    </g>
+        </g>
+      ))
+    }
   </g>
 </svg>
 
@@ -68,9 +83,8 @@ const { x, y } = center;
     overflow: visible;
   }
 
-  /* Rotate and scale SVG parts around their own centres. */
-  .km-slice,
-  .km-bracket,
+  /* Scale SVG parts around their own centres. */
+  .km-mark,
   .km-seed,
   .km-ring,
   .km-core {
@@ -78,57 +92,73 @@ const { x, y } = center;
     transform-origin: center;
   }
 
-  /* Small hover flourish, used by the header logo link. */
-  :global(a:hover) > .kiwi-mark .km-slice,
-  :global(a:focus-visible) > .kiwi-mark .km-slice {
-    transform: rotate(45deg);
+  /* Small hover flourish, used by the header logo link: the halves part. */
+  .km-half {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .km-slice {
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  :global(a:hover) > .kiwi-mark .km-half--a,
+  :global(a:focus-visible) > .kiwi-mark .km-half--a {
+    transform: translate(-4px, -0.8px);
+  }
+  :global(a:hover) > .kiwi-mark .km-half--b,
+  :global(a:focus-visible) > .kiwi-mark .km-half--b {
+    transform: translate(4px, 0.8px);
   }
 
   /* ---------- Hero intro animation ---------- */
+  /* The halves slide in from opposite ends of the cut, then the middle and
+     seeds pop in, then the halves gently breathe apart and back. */
   @media (prefers-reduced-motion: no-preference) {
-    .is-animated .km-slice {
+    .is-animated .km-half--a {
       animation:
-        km-slice-in 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
-        km-spin 90s linear 1.4s infinite;
+        km-in-a 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+        km-breathe-a 4s ease-in-out 1.6s infinite;
+    }
+    .is-animated .km-half--b {
+      animation:
+        km-in-b 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both,
+        km-breathe-b 4s ease-in-out 1.6s infinite;
     }
     .is-animated .km-ring {
-      animation: km-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s both;
+      animation: km-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
     }
     .is-animated .km-core {
-      animation: km-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+      animation: km-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.75s both;
     }
     .is-animated .km-seed {
       animation: km-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      animation-delay: calc(0.75s + var(--i) * 0.035s);
-    }
-    .is-animated .km-bracket--left {
-      animation:
-        km-bracket-left 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both,
-        km-breathe-left 4s ease-in-out 1.6s infinite;
-    }
-    .is-animated .km-bracket--right {
-      animation:
-        km-bracket-right 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both,
-        km-breathe-right 4s ease-in-out 1.6s infinite;
+      animation-delay: calc(0.85s + var(--i) * 0.045s);
     }
   }
 
-  @keyframes km-slice-in {
+  @keyframes km-in-a {
     from {
       opacity: 0;
-      transform: scale(0.4) rotate(-120deg);
+      transform: translate(-14px, 64px);
     }
     to {
       opacity: 1;
-      transform: scale(1) rotate(0deg);
+      transform: translate(0, 0);
     }
   }
-  @keyframes km-spin {
+  @keyframes km-in-b {
+    from {
+      opacity: 0;
+      transform: translate(14px, -64px);
+    }
     to {
-      transform: rotate(360deg);
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes km-breathe-a {
+    50% {
+      transform: translate(-3px, -0.6px);
+    }
+  }
+  @keyframes km-breathe-b {
+    50% {
+      transform: translate(3px, 0.6px);
     }
   }
   @keyframes km-pop {
@@ -139,36 +169,6 @@ const { x, y } = center;
     to {
       opacity: 1;
       transform: scale(1);
-    }
-  }
-  @keyframes km-bracket-left {
-    from {
-      opacity: 0;
-      transform: translateX(120px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes km-bracket-right {
-    from {
-      opacity: 0;
-      transform: translateX(-120px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes km-breathe-left {
-    50% {
-      transform: translateX(-10px);
-    }
-  }
-  @keyframes km-breathe-right {
-    50% {
-      transform: translateX(10px);
     }
   }
 </style>

@@ -11,13 +11,12 @@
  */
 
 // Fonts are self-hosted from npm packages; only the Latin subsets download.
-import '@fontsource/poppins/latin-600.css';
-import '@fontsource/poppins/latin-700.css';
+import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/inter/wght.css';
 import '../styles/global.css';
 
 // Preload the two fonts visible straight away, so text doesn't jump.
-import poppinsBold from '@fontsource/poppins/files/poppins-latin-700-normal.woff2?url';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
 import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 
 import Header from '../components/Header.astro';
@@ -41,7 +40,7 @@ const jsonLd = {
   url: site.url,
   email: site.email,
   image: ogImage.href,
-  logo: new URL('/logo-instagram.png', Astro.site).href,
+  logo: new URL('/logo-square.png', Astro.site).href,
   description: site.description,
   founder: { '@type': 'Person', name: site.owner },
   areaServed: [
@@ -65,14 +64,14 @@ const jsonLd = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#112A1F" />
+    <meta name="theme-color" content="#0D1B14" />
     <meta name="color-scheme" content="dark light" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <link rel="preload" href={poppinsBold} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
 
     <!-- Open Graph / social sharing -->
@@ -85,7 +84,7 @@ const jsonLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="The Kiwi and Code logo: a kiwi slice between code brackets" />
+    <meta property="og:image:alt" content="The Kiwi and Code logo: a kiwi slice cut in two by a slash" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

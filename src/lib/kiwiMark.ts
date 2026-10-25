@@ -1,86 +1,88 @@
 /**
- * Geometry for the Kiwi and Code mark: a kiwi slice between code brackets.
+ * Geometry for the Kiwi and Code mark: a kiwi slice cut clean in two by a
+ * slash, the "/" from </>. The two halves sit slightly apart so the gap
+ * between them reads as the slash.
  *
- * Coordinates match the original 1080×1080 logo PNG, so the slice is centred
- * at (540, 450). Both the header logo (LogoMark.astro) and the favicon
- * (pages/favicon.svg.ts) are drawn from these numbers, so they always match.
+ * Everything is drawn on a 120×120 grid centred at (60, 60). The header and
+ * hero logo (LogoMark.astro), the favicon (pages/favicon.svg.ts) and the
+ * PNG icons (scripts/make-icons.mjs) are all built from these numbers, so
+ * they always match.
  */
 
 export const colors = {
-  forest: '#112A1F',
-  kiwi: '#8CC63F',
-  ray: '#A6D457',
-  ring: '#C3E27F',
-  core: '#F4F2D8',
-  skin: '#7D5733',
-  seed: '#2A1B10',
+  ink: '#0D1B14',
+  skin: '#7A4E2C',
+  kiwi: '#9BE15D',
+  lime: '#D4F5A8',
+  paper: '#FAF7EC',
 };
 
-export const center = { x: 540, y: 450 };
+export const viewBox = '0 0 120 120';
+export const center = { x: 60, y: 60 };
 
 export const radius = {
-  skin: 200, // brown rim
-  flesh: 187, // main green
-  ring: 125, // pale inner ring
-  core: 60, // cream centre
+  skin: 46, // brown rim
+  flesh: 42.5, // main green
+  ring: 27, // pale inner ring
+  core: 11, // cream centre
 };
 
-/** Crop of the logo that holds just the mark (no wordmark). */
-export const viewBox = '180 240 720 420';
-
-/** Chevron paths for the < and > brackets. */
-export const brackets = {
-  left: 'M285 357 L200 450 L285 543',
-  right: 'M795 357 L880 450 L795 543',
-  width: 26,
+/**
+ * The cut runs from (75, -10) to (45, 130), through the centre, leaning like
+ * a "/". Each half is clipped to one side of it, then nudged away from the
+ * line by `offset` (along the line's normal) to open the gap.
+ */
+export const cut = {
+  left: '-10,-10 75,-10 45,130 -10,130',
+  right: '75,-10 130,-10 130,130 45,130',
+  offset: { x: 3.9, y: 0.8 },
 };
 
-const SEED_COUNT = 18;
-const SEED_RADIUS = 97;
-const RAY_COUNT = 40;
+const SEED_COUNT = 10;
+const SEED_RADIUS = 19;
 
 const round = (n: number) => Math.round(n * 10) / 10;
 
 /** Seeds sit in a ring, each one pointing out from the centre. */
 export const seeds = Array.from({ length: SEED_COUNT }, (_, i) => {
-  const angle = (i / SEED_COUNT) * 360;
+  const angle = (i / SEED_COUNT) * 360 + 18;
   const rad = (angle * Math.PI) / 180;
   return {
     cx: round(center.x + SEED_RADIUS * Math.sin(rad)),
     cy: round(center.y - SEED_RADIUS * Math.cos(rad)),
-    // SVG rotation is clockwise from "up", which matches how we placed them.
     rotate: round(angle),
   };
 });
 
-/** Faint radial lines in the flesh, alternating long and short. */
-export const rays = Array.from({ length: RAY_COUNT }, (_, i) => {
-  const rad = ((i + 0.5) / RAY_COUNT) * Math.PI * 2;
-  const inner = i % 2 === 0 ? 136 : 150;
-  const outer = 176;
-  return {
-    x1: round(center.x + inner * Math.sin(rad)),
-    y1: round(center.y - inner * Math.cos(rad)),
-    x2: round(center.x + outer * Math.sin(rad)),
-    y2: round(center.y - outer * Math.cos(rad)),
-  };
-});
+export const seedSize = { rx: 1.9, ry: 3.7 };
 
-/** The kiwi slice as a plain SVG string (used by the favicon). */
+/** One whole (uncut) slice as a plain SVG string. */
 export function sliceMarkup(): string {
   const { x, y } = center;
   return [
     `<circle cx="${x}" cy="${y}" r="${radius.skin}" fill="${colors.skin}"/>`,
     `<circle cx="${x}" cy="${y}" r="${radius.flesh}" fill="${colors.kiwi}"/>`,
-    `<g stroke="${colors.ray}" stroke-width="5" stroke-linecap="round">`,
-    ...rays.map((r) => `<line x1="${r.x1}" y1="${r.y1}" x2="${r.x2}" y2="${r.y2}"/>`),
-    `</g>`,
-    `<circle cx="${x}" cy="${y}" r="${radius.ring}" fill="${colors.ring}"/>`,
-    `<circle cx="${x}" cy="${y}" r="${radius.core}" fill="${colors.core}"/>`,
-    `<g fill="${colors.seed}">`,
+    `<circle cx="${x}" cy="${y}" r="${radius.ring}" fill="${colors.lime}"/>`,
+    `<circle cx="${x}" cy="${y}" r="${radius.core}" fill="${colors.paper}"/>`,
+    `<g fill="${colors.ink}">`,
     ...seeds.map(
-      (s) => `<ellipse cx="${s.cx}" cy="${s.cy}" rx="7" ry="12" transform="rotate(${s.rotate} ${s.cx} ${s.cy})"/>`,
+      (s) =>
+        `<ellipse cx="${s.cx}" cy="${s.cy}" rx="${seedSize.rx}" ry="${seedSize.ry}" transform="rotate(${s.rotate} ${s.cx} ${s.cy})"/>`,
     ),
     `</g>`,
+  ].join('');
+}
+
+/**
+ * The full cut mark as SVG elements (no <svg> wrapper), for the favicon and
+ * PNG icons. `id` keeps clip-path ids unique if several marks share a page.
+ */
+export function markMarkup(id = 'kc'): string {
+  const { x: dx, y: dy } = cut.offset;
+  return [
+    `<defs><clipPath id="${id}-l"><polygon points="${cut.left}"/></clipPath>`,
+    `<clipPath id="${id}-r"><polygon points="${cut.right}"/></clipPath></defs>`,
+    `<g clip-path="url(#${id}-l)" transform="translate(${-dx} ${-dy})">${sliceMarkup()}</g>`,
+    `<g clip-path="url(#${id}-r)" transform="translate(${dx} ${dy})">${sliceMarkup()}</g>`,
   ].join('');
 }

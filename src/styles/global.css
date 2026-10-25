@@ -22,8 +22,8 @@ html {
 }
 body {
   min-height: 100dvh;
-  background: var(--forest);
-  color: var(--paper);
+  background: var(--ink);
+  color: var(--chalk);
   font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: 1.6;
@@ -54,7 +54,8 @@ h2,
 h3,
 .wordmark {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-stretch: 112%;
+  font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -67,7 +68,7 @@ h2 {
 }
 h3 {
   font-size: var(--step-1);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 p {
@@ -77,24 +78,24 @@ p {
 /* ---------- Section themes ---------- */
 /* Each section picks a theme; children use these variables for colour. */
 .theme-dark {
-  --bg: var(--forest);
-  --surface: var(--forest-raised);
-  --text: var(--paper);
+  --bg: var(--ink);
+  --surface: var(--ink-raised);
+  --text: var(--chalk);
   --muted: var(--mist);
   --accent: var(--kiwi);
-  --accent-text: var(--kiwi-light);
-  --line: var(--forest-line);
+  --accent-text: var(--lime);
+  --line: var(--ink-line);
   background: var(--bg);
   color: var(--text);
 }
 .theme-light {
-  --bg: var(--cream);
-  --surface: var(--cream-raised);
-  --text: var(--forest);
-  --muted: var(--moss);
-  --accent: var(--kiwi-deep);
-  --accent-text: var(--kiwi-deep);
-  --line: var(--cream-line);
+  --bg: var(--paper);
+  --surface: var(--paper-raised);
+  --text: var(--ink);
+  --muted: var(--stone);
+  --accent: var(--leaf);
+  --accent-text: var(--leaf);
+  --line: var(--paper-line);
   background: var(--bg);
   color: var(--text);
 }
@@ -137,7 +138,7 @@ p {
 /* ---------- Buttons ---------- */
 .btn {
   --btn-bg: var(--kiwi);
-  --btn-text: var(--forest);
+  --btn-text: var(--ink);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -161,7 +162,7 @@ p {
 }
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -10px rgb(140 198 63 / 0.6);
+  box-shadow: 0 10px 24px -10px rgb(155 225 93 / 0.6);
 }
 .btn:active {
   transform: translateY(0);
@@ -184,11 +185,11 @@ p {
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 .theme-light .btn:not(.btn--ghost) {
-  --btn-bg: var(--forest);
-  --btn-text: var(--paper);
+  --btn-bg: var(--ink);
+  --btn-text: var(--chalk);
 }
 .theme-light .btn:not(.btn--ghost):hover {
-  box-shadow: 0 10px 24px -10px rgb(17 42 31 / 0.5);
+  box-shadow: 0 10px 24px -10px rgb(13 27 20 / 0.5);
 }
 
 /* Inline text links */
@@ -208,7 +209,7 @@ p {
   border-radius: 4px;
 }
 .theme-light :focus-visible {
-  outline-color: var(--kiwi-deep);
+  outline-color: var(--leaf);
 }
 .skip-link {
   position: absolute;
@@ -218,7 +219,7 @@ p {
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius-s);
   background: var(--kiwi);
-  color: var(--forest);
+  color: var(--ink);
   font-weight: 600;
 }
 .skip-link:focus {
