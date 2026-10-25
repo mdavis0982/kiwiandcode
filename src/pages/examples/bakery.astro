@@ -26,7 +26,7 @@ type Category = 'bread' | 'pastry' | 'sweet';
 
 const menu: { name: string; note: string; price: string; cat: Category; icon: keyof typeof bakes; tag?: string }[] = [
   { name: 'Country sourdough', note: 'A slow 48-hour rise, a crackly crust and a soft, open middle.', price: '£4.50', cat: 'bread', icon: 'loaf', tag: 'Best seller' },
-  { name: 'Wheaten bread', note: 'The Northern Irish classic, made with buttermilk and wholemeal.', price: '£3.20', cat: 'bread', icon: 'loaf' },
+  { name: 'Wheaten bread', note: 'The Irish classic, made with buttermilk and wholemeal.', price: '£3.20', cat: 'bread', icon: 'loaf' },
   { name: 'Soda farls', note: 'Griddled every morning. Made for an Ulster fry.', price: '£2.40 for 4', cat: 'bread', icon: 'farl' },
   { name: 'Butter croissant', note: 'Three days of folding, 27 flaky layers, real French butter.', price: '£2.20', cat: 'pastry', icon: 'croissant' },
   { name: 'Cinnamon swirl', note: 'Brown sugar, cinnamon and a vanilla icing drizzle.', price: '£2.80', cat: 'pastry', icon: 'swirl', tag: 'Gone by 11' },
@@ -105,7 +105,7 @@ const headline = ['Baked', 'before', "you're"];
             <em class="word" style={`--i: ${headline.length}`}>awake.</em>
           </h1>
           <p class="lead">
-            Sourdough, flaky croissants and proper Northern Irish traybakes, made from scratch every morning on Main Street,
+            Sourdough, flaky croissants and proper Irish traybakes, made from scratch every morning on Main Street,
             Ballyfern.
           </p>
           <div class="actions">

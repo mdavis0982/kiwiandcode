@@ -6,7 +6,7 @@ export const site = {
   url: 'https://kiwiandcode.co.uk',
   owner: 'Marcus Davis',
   email: 'marcus@kiwiandcode.co.uk',
-  area: 'County Down, Northern Ireland',
+  area: 'County Down, Ireland',
 
   // Placeholder: set this to the full profile URL once the account exists,
   // e.g. 'https://www.instagram.com/kiwiandcode'. While it's null the footer
@@ -14,9 +14,9 @@ export const site = {
   instagram: null as string | null,
 
   // Default SEO text, used by any page that doesn't set its own.
-  title: 'Kiwi and Code | Affordable websites for small businesses in Northern Ireland',
+  title: 'Kiwi and Code | Affordable websites for small businesses in County Down, Ireland',
   description:
-    'Clean, fast, affordable websites for small and local businesses in County Down and across Northern Ireland. Built by Marcus Davis, a local developer you can talk to.',
+    'Clean, fast, affordable websites for small and local businesses in County Down, Ireland. Built by Marcus Davis, a local developer you can talk to.',
   ogImage: '/og-image.png',
 };
 

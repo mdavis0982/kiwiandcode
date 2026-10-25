@@ -8,6 +8,7 @@
  *   </BaseLayout>
  *
  * title and description are optional and fall back to the defaults in site.ts.
+ * Pass noindex to keep a page out of search results.
  */
 
 // Fonts are self-hosted from npm packages; only the Latin subsets download.
@@ -26,9 +27,11 @@ import { site } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
+  /** Keep this page out of search results (used by the 404 page). */
+  noindex?: boolean;
 }
 
-const { title = site.title, description = site.description } = Astro.props;
+const { title = site.title, description = site.description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(site.ogImage, Astro.site);
 
@@ -45,7 +48,7 @@ const jsonLd = {
   founder: { '@type': 'Person', name: site.owner },
   areaServed: [
     { '@type': 'AdministrativeArea', name: 'County Down' },
-    { '@type': 'AdministrativeArea', name: 'Northern Ireland' },
+    { '@type': 'Place', name: 'Ireland' },
   ],
   address: {
     '@type': 'PostalAddress',
@@ -63,7 +66,7 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#0D1B14" />
     <meta name="color-scheme" content="dark light" />
 

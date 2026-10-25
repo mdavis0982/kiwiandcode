@@ -1,0 +1,68 @@
+---
+/**
+ * Not found page. Cloudflare Pages serves dist/404.html automatically for any
+ * URL that doesn't exist. The "0" is the logo mark, so the 404 is "sliced".
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LogoMark from '../components/LogoMark.astro';
+import { links } from '../data/site';
+---
+
+<BaseLayout title="Page not found | Kiwi and Code" description="Sorry, that page doesn't exist." noindex>
+  <section class="section theme-dark not-found" aria-labelledby="nf-title">
+    <div class="container">
+      <p class="code" aria-hidden="true">
+        <span>4</span>
+        <LogoMark animated class="nf-mark" />
+        <span>4</span>
+      </p>
+      <h1 id="nf-title">This page got sliced off.</h1>
+      <p class="lead">The link might be old or mistyped. Everything else is still here.</p>
+      <div class="actions">
+        <a class="btn" href="/">Back to the homepage</a>
+        <a class="btn btn--ghost" href={links.contact}>Get in touch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: min(80svh, 44rem);
+    display: grid;
+    align-items: center;
+    text-align: center;
+  }
+  .code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05em;
+    margin-bottom: var(--space-m);
+    font-family: var(--font-heading);
+    font-size: clamp(5rem, 3rem + 10vw, 10rem);
+    font-stretch: 112%;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--chalk);
+  }
+  .code :global(.nf-mark) {
+    width: 0.95em;
+  }
+  h1 {
+    margin-bottom: var(--space-s);
+  }
+  .lead {
+    max-width: 30rem;
+    margin-inline: auto;
+    color: var(--mist);
+    font-size: var(--step-1);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+</style>

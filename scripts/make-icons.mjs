@@ -57,7 +57,7 @@ const icons = [
       <div style="flex:none;width:340px">${mark('og')}</div>
       <div>
         <p style="font-size:84px;font-weight:800;font-stretch:112%;letter-spacing:-0.03em;line-height:1">Kiwi <span style="color:${colors.lime};font-weight:600">and</span> Code</p>
-        <p style="margin-top:28px;font-size:34px;font-weight:500;line-height:1.3;color:#B4BFB7;max-width:620px">Clean, affordable websites for <span style="color:${colors.kiwi}">local businesses</span> in Northern Ireland.</p>
+        <p style="margin-top:28px;font-size:34px;font-weight:500;line-height:1.3;color:#B4BFB7;max-width:620px">Clean, affordable websites for <span style="color:${colors.kiwi}">local businesses</span> in County Down, Ireland.</p>
       </div>
     </div>`,
   },

@@ -1,6 +1,6 @@
 # Kiwi and Code
 
-The website for [Kiwi and Code](https://kiwiandcode.co.uk): clean, affordable websites for small and local businesses in County Down and across Northern Ireland.
+The website for [Kiwi and Code](https://kiwiandcode.co.uk): clean, affordable websites for small and local businesses in County Down, Ireland.
 
 Built with [Astro](https://astro.build) as a static site, hosted on Cloudflare Pages. The homepage ships almost no JavaScript (just a scroll-reveal helper and the "copy email" button), and the fonts are self-hosted.
 
@@ -34,6 +34,7 @@ src/
   styles/tokens.css         colours, fonts, sizes (the design system)
   styles/global.css         base styles, buttons, section themes, animations
   layouts/BaseLayout.astro  <head>, SEO tags, header, footer, shared scripts
+  layouts/ExampleLayout.astro  shell for the example sites (the "made up" strip, noindex)
   lib/kiwiMark.ts           geometry of the logo mark (kiwi slice cut by a "/")
   components/
     LogoMark.astro          the logo mark as SVG (header, hero, footer)
@@ -42,7 +43,11 @@ src/
   pages/
     index.astro             the homepage
     favicon.svg.ts          builds /favicon.svg from the logo geometry
-    examples/               example sites (bakery, personal trainer)
+    404.astro               "page not found" page (Cloudflare serves it automatically)
+    examples/               made-up example sites, each with its own branding:
+      bakery.astro            Little Loaf Bakehouse
+      personal-trainer.astro  Caitlin, personal trainer
+      nails-and-beauty.astro  Maison Lacquer, nail and beauty studio
 scripts/
   make-icons.mjs            renders the PNG icons (needs Google Chrome)
 ```
@@ -52,6 +57,8 @@ scripts/
 - **Text on the homepage:** each section's words are at the top of its file in `src/components/home/`.
 - **Email, Instagram, SEO title or description:** `src/data/site.ts`. Set `instagram` to your profile URL and the footer link appears.
 - **Your photo:** save it as `src/assets/marcus.jpg` and follow the steps at the top of `src/components/home/About.astro`.
+- **Logo:** the mark's shape and colours live in `src/lib/kiwiMark.ts`. After changing it, run `npm run icons` to redraw the favicon PNGs, `logo-square.png` (for Instagram) and `og-image.png`.
+- **Example sites:** each is one file in `src/pages/examples/`, with its words and prices at the top. The homepage cards are in `src/components/home/ExamplesTeaser.astro`.
 - **Colours:** `src/styles/tokens.css`. Check any new text colour for at least 4.5:1 contrast ([WebAIM checker](https://webaim.org/resources/contrastchecker/)).
 
 ## Adding pages later

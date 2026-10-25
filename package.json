@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "Website for Kiwi and Code: clean, affordable websites for local businesses in Northern Ireland.",
+  "description": "Website for Kiwi and Code: clean, affordable websites for local businesses in County Down, Ireland.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
