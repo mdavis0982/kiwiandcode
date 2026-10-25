@@ -1,0 +1,11 @@
+// Cloudflare Workers config: serves the built static site from dist/.
+// Cloudflare runs `npm run build`, then `npx wrangler deploy` uploads dist/.
+{
+  "name": "kiwiandcode",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Show src/pages/404.astro for unknown URLs.
+    "not_found_handling": "404-page"
+  }
+}
