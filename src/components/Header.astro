@@ -116,12 +116,19 @@ import { links, nav, site } from '../data/site';
     order: 3;
     width: 100%;
   }
+  /* Phone: one row that spreads across the width, and scrolls sideways
+     on very narrow screens rather than wrapping onto a second line. */
   .nav ul {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.25rem;
+    justify-content: space-between;
+    gap: 0 0.7rem;
     padding: 0;
     list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav li {
+    flex: none;
   }
   .nav a {
     position: relative;
@@ -163,7 +170,14 @@ import { links, nav, site } from '../data/site';
     font-size: var(--step--1);
   }
 
-  @media (min-width: 52rem) {
+  @media (min-width: 40rem) {
+    .nav ul {
+      justify-content: flex-start;
+      gap: 0 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
     .header-inner {
       flex-wrap: nowrap;
       padding-block: 1rem;
@@ -174,7 +188,8 @@ import { links, nav, site } from '../data/site';
       margin-left: auto;
     }
     .nav ul {
-      gap: 2rem;
+      gap: 1.5rem;
+      overflow: visible;
     }
     .nav a {
       font-size: var(--step-0);
@@ -182,6 +197,12 @@ import { links, nav, site } from '../data/site';
     .header-cta {
       font-size: var(--step-0);
       padding-inline: 1.4rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .nav ul {
+      gap: 2rem;
     }
   }
 
