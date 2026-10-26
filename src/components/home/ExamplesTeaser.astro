@@ -73,7 +73,10 @@ const pageLive = !links.examples.startsWith('/#');
                   <p class="url">{ex.name}</p>
                 </div>
 
-                <div class={`preview preview--${ex.id}`}>
+                <div
+                  class={`preview preview--${ex.id}`}
+                  style={`view-transition-name: ex-${ex.id}; view-transition-class: example`}
+                >
                   <div class="page">
                     {ex.id === 'bakery' && (
                       <>
@@ -159,6 +162,17 @@ const pageLive = !links.examples.startsWith('/#');
       }
     </ul>
 
+    {/* Phone only: dots that show which card is in view and jump between them. */}
+    <div class="dots" role="group" aria-label="Choose an example">
+      {
+        examples.map((ex, i) => (
+          <button type="button" class="dot" data-dot={i} aria-label={ex.name} aria-current={i === 0 ? 'true' : undefined}>
+            <span aria-hidden="true" />
+          </button>
+        ))
+      }
+    </div>
+
     {
       pageLive && (
         <p class="all" data-reveal>
@@ -170,6 +184,38 @@ const pageLive = !links.examples.startsWith('/#');
     }
   </div>
 </section>
+
+<script>
+  // Keep the dots in step with the swipeable row, and let them scroll it.
+  const row = document.querySelector<HTMLElement>('.examples');
+  const cards = [...document.querySelectorAll<HTMLElement>('.examples > .example')];
+  const dots = [...document.querySelectorAll<HTMLButtonElement>('.dots .dot')];
+
+  if (row && cards.length && dots.length) {
+    const setActive = (index: number) =>
+      dots.forEach((dot, i) => (i === index ? dot.setAttribute('aria-current', 'true') : dot.removeAttribute('aria-current')));
+
+    dots.forEach((dot, i) =>
+      dot.addEventListener('click', () => {
+        const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        row.scrollTo({ left: cards[i].offsetLeft - row.offsetLeft - parseFloat(getComputedStyle(row).scrollPaddingLeft || '0'), behavior: smooth ? 'smooth' : 'auto' });
+        setActive(i);
+      }),
+    );
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) setActive(cards.indexOf(entry.target as HTMLElement));
+          }
+        },
+        { root: row, threshold: 0.6 },
+      );
+      cards.forEach((card) => observer.observe(card));
+    }
+  }
+</script>
 
 <style>
   /* Phone: a swipeable row that snaps card by card. Wider: three columns. */
@@ -517,6 +563,44 @@ const pageLive = !links.examples.startsWith('/#');
     margin-top: 0.3rem;
     color: var(--muted);
   }
+  /* ---------- Dots (phone only) ---------- */
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-top: -0.5rem;
+  }
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 2.75rem; /* 44px tap target around a small dot */
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .dot span {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--paper-line);
+    box-shadow: inset 0 0 0 1.5px var(--stone);
+    transition:
+      transform 0.35s var(--ease-spring),
+      background-color 0.2s;
+  }
+  .dot[aria-current] span {
+    background: var(--ink);
+    box-shadow: none;
+    transform: scaleX(2.2);
+  }
+  @media (min-width: 48rem) {
+    .dots {
+      display: none;
+    }
+  }
+
   .all {
     margin-top: var(--space-l);
     text-align: center;
