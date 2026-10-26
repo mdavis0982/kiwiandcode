@@ -1,7 +1,9 @@
 ---
 /**
  * How it works: four steps from first chat to launch.
- * A kiwi-green line draws along the steps when the section scrolls into view.
+ * A kiwi-green line draws along the steps as you scroll, and each step lights
+ * up as the line reaches it. Browsers without scroll-driven animations get a
+ * one-off draw-in when the section comes into view instead.
  */
 const steps = [
   {
@@ -170,6 +172,108 @@ const steps = [
   @media (min-width: 56rem) and (prefers-reduced-motion: no-preference) {
     :global(.js) .steps::after {
       transform: scale(0, 1);
+    }
+  }
+
+  /*
+   * Scroll-driven version: the line's tip follows a point 60% down the screen
+   * (phones) or fills over a few hundred pixels of scroll (wide screens).
+   * Ranges are offsets into the list's "cover" range; 100% is the full range.
+   */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .steps {
+        view-timeline-name: --steps;
+      }
+      :global(.js) .steps::after {
+        transition: none;
+        animation-name: draw-down;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --steps;
+        animation-range: cover 40vh cover calc(100% - 60vh);
+      }
+      :global(.js) .steps .step {
+        transition: none;
+        animation-name: step-in;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: cover 5vh cover 30vh;
+      }
+      :global(.js) .steps .dot {
+        transition: none;
+        animation-name: light-up;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: cover 40vh cover calc(40vh + 3rem);
+      }
+    }
+    @media (min-width: 56rem) and (prefers-reduced-motion: no-preference) {
+      :global(.js) .steps::after {
+        animation-name: draw-across;
+        animation-range: cover 25vh cover calc(100% - 55vh);
+      }
+      /* All dots share one row, so each lights at its share of the line's range. */
+      :global(.js) .steps .dot {
+        animation-timeline: --steps;
+        animation-range:
+          cover calc(25vh + (100% - 80vh) * var(--i) / 3 - 1%)
+          cover calc(25vh + (100% - 80vh) * var(--i) / 3 + 3%);
+      }
+      :global(.js) .steps .step {
+        animation-timeline: --steps;
+        animation-range: cover 5vh cover 25vh;
+      }
+    }
+  }
+  @keyframes draw-down {
+    from {
+      transform: scale(1, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes draw-across {
+    from {
+      transform: scale(0, 1);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes light-up {
+    from {
+      background: var(--surface);
+      color: var(--muted);
+      box-shadow:
+        0 0 0 6px var(--bg),
+        inset 0 0 0 2px var(--line);
+      transform: scale(0.8);
+    }
+    60% {
+      transform: scale(1.12);
+    }
+    to {
+      background: var(--ink);
+      color: var(--kiwi);
+      box-shadow: 0 0 0 6px var(--bg);
+      transform: none;
     }
   }
 </style>

@@ -1,0 +1,33 @@
+---
+/**
+ * Shown when the contact form can't be sent and the browser posted it
+ * without JavaScript (with JavaScript, errors show on the form itself).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site';
+---
+
+<BaseLayout title="Message not sent | Kiwi and Code" description="Your message couldn't be sent." noindex>
+  <section class="section theme-dark" aria-labelledby="problem-title">
+    <div class="container narrow">
+      <p class="eyebrow">Message not sent</p>
+      <h1 id="problem-title">Sorry, that didn't send</h1>
+      <p class="lead">
+        Please go back and check every field is filled in, or email me at
+        <a class="link" href={`mailto:${site.email}`}>{site.email}</a> instead.
+      </p>
+      <a class="btn" href="/contact/">Back to the form</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .narrow {
+    max-width: 40rem;
+  }
+  .lead {
+    margin-block: var(--space-s) var(--space-l);
+    color: var(--muted);
+    font-size: var(--step-1);
+  }
+</style>

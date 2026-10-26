@@ -14,11 +14,17 @@
   margin: 0;
 }
 html {
-  -webkit-text-size-adjust: none;
-  text-size-adjust: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Leave room for the sticky header when jumping to #sections. */
-  scroll-padding-top: 5rem;
+  /* Leave room for the sticky header when jumping to #sections or focusing a
+     field (the header is two rows tall on phones). */
+  scroll-padding-top: 8rem;
+}
+@media (min-width: 52rem) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
 }
 body {
   min-height: 100dvh;
@@ -43,9 +49,25 @@ button {
   font: inherit;
 }
 
-/* Smooth cross-fade between pages (no JavaScript needed). */
+/* Smooth cross-fade between pages (no JavaScript needed). Example cards
+   morph into their example page's hero via view-transition-name. */
 @view-transition {
   navigation: auto;
+}
+::view-transition-group(*.example) {
+  animation-duration: 0.55s;
+  animation-timing-function: var(--ease-out);
+}
+/* Keep the snapshots in proportion while the card grows into the hero. */
+::view-transition-old(*.example),
+::view-transition-new(*.example) {
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+/* The cards that aren't being opened just fade out with the rest of the page. */
+::view-transition-old(*.example):only-child {
+  animation-duration: 0.25s;
 }
 
 /* ---------- Typography ---------- */
@@ -113,7 +135,7 @@ p {
   max-width: 40rem;
   margin-bottom: var(--space-l);
 }
-.section-head p {
+.section-head p:not(.eyebrow) {
   margin-top: var(--space-s);
   color: var(--muted);
   font-size: var(--step-1);
@@ -259,6 +281,11 @@ p {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
   *,
   *::before,

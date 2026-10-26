@@ -1,10 +1,10 @@
 ---
 /**
- * Contact call to action. Email only for now; a proper contact form
- * comes with the contact page later.
+ * Contact call to action: a button to the contact form, plus the email
+ * address with a copy button for people who'd rather email.
  */
 import LogoMark from '../LogoMark.astro';
-import { site } from '../../data/site';
+import { links, site } from '../../data/site';
 ---
 
 <section id="contact" class="section theme-dark contact" aria-labelledby="contact-title">
@@ -18,13 +18,13 @@ import { site } from '../../data/site';
         <p class="eyebrow">Get in touch</p>
         <h2 id="contact-title">Got a project in mind, or just a question?</h2>
         <p class="sub">
-          Drop me an email and tell me a bit about your business. Quotes are free and there's no obligation, so it costs
-          nothing to ask.
+          Send me a message and tell me a bit about your business. Quotes are free and there's no obligation, so it
+          costs nothing to ask.
         </p>
 
         <div class="actions">
-          <a class="btn btn--big" href={`mailto:${site.email}?subject=Website%20enquiry`}>
-            Email me
+          <a class="btn btn--big" href={links.contact}>
+            Send a message
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
               ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               ></path></svg

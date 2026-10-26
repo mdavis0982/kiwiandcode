@@ -31,6 +31,36 @@ import { links, nav, site } from '../data/site';
   </div>
 </header>
 
+<script>
+  // Highlight the nav link for the section in view. A section counts as
+  // "in view" once it crosses a line about a third of the way down the screen.
+  // Pages without these sections (404) simply never highlight anything.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.nav a[href*="#"]')];
+  const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+  const sections = [...byId.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const link = byId.get(entry.target.id);
+          if (!link) continue;
+          if (entry.isIntersecting) {
+            links.forEach((a) => a.removeAttribute('aria-current'));
+            link.setAttribute('aria-current', 'true');
+          } else if (link.hasAttribute('aria-current')) {
+            link.removeAttribute('aria-current');
+          }
+        }
+      },
+      { rootMargin: '-35% 0px -60% 0px' },
+    );
+    sections.forEach((el) => observer.observe(el));
+  }
+</script>
+
 <style>
   .site-header {
     position: sticky;
@@ -64,6 +94,7 @@ import { links, nav, site } from '../data/site';
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
+    min-height: 2.75rem;
     text-decoration: none;
     color: var(--chalk);
   }
@@ -94,8 +125,9 @@ import { links, nav, site } from '../data/site';
   }
   .nav a {
     position: relative;
-    display: inline-block;
-    padding-block: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem; /* 44px tap target */
     font-size: var(--step--1);
     font-weight: 500;
     color: var(--mist);
@@ -116,10 +148,12 @@ import { links, nav, site } from '../data/site';
     transform-origin: left;
     transition: transform 0.3s var(--ease-out);
   }
-  .nav a:hover {
+  .nav a:hover,
+  .nav a[aria-current] {
     color: var(--chalk);
   }
-  .nav a:hover::after {
+  .nav a:hover::after,
+  .nav a[aria-current]::after {
     transform: scaleX(1);
   }
 

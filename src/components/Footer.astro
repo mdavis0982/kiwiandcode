@@ -63,6 +63,7 @@ const year = new Date().getFullYear();
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
+    min-height: 2.75rem;
     text-decoration: none;
     color: var(--chalk);
   }
@@ -91,7 +92,7 @@ const year = new Date().getFullYear();
   }
   .link {
     display: inline-block;
-    padding-block: 0.25rem;
+    padding-block: 0.6rem; /* 44px tap target */
     overflow-wrap: anywhere;
   }
   @media (min-width: 48rem) {
