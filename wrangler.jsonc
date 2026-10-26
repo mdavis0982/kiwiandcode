@@ -13,6 +13,8 @@
     // Show src/pages/404.astro for unknown URLs.
     "not_found_handling": "404-page"
   },
+  // Lets Cloudflare build preview versions of non-main branches (`wrangler preview`).
+  "previews": {},
   // The bare domain is the site's real address; www is routed here only to redirect.
   "routes": [
     { "pattern": "kiwiandcode.co.uk", "custom_domain": true },
