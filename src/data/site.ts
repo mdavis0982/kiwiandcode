@@ -25,6 +25,7 @@ export const site = {
  */
 export const links = {
   examples: '/#examples',
+  pricing: '/#pricing',
   contact: '/contact/',
 };
 
@@ -33,4 +34,5 @@ export const nav = [
   { label: 'How it works', href: '/#process' },
   { label: 'About', href: '/#about' },
   { label: 'Examples', href: links.examples },
+  { label: 'Prices', href: links.pricing },
 ];
