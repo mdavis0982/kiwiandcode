@@ -13,6 +13,8 @@
     // Show src/pages/404.astro for unknown URLs.
     "not_found_handling": "404-page"
   },
+  // Contact form emails go out through Email Routing, only ever to this verified inbox.
+  "send_email": [{ "name": "SEND_EMAIL", "destination_address": "kiwiandcode@gmail.com" }],
   // Lets Cloudflare build preview versions of non-main branches (`wrangler preview`).
   "previews": {},
   // The bare domain is the site's real address; www is routed here only to redirect.

@@ -20,13 +20,12 @@ export const site = {
 
 /**
  * Where the main buttons and nav links point.
- * The examples and contact pages don't exist yet, so these jump to sections
- * on the homepage. When the real pages are built, change them to
- * '/examples/' and '/contact/'.
+ * There's no separate examples index yet, so that one jumps to the homepage
+ * section. When it exists, change it to '/examples/'.
  */
 export const links = {
   examples: '/#examples',
-  contact: '/#contact',
+  contact: '/contact/',
 };
 
 export const nav = [

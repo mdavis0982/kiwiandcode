@@ -17,8 +17,14 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Leave room for the sticky header when jumping to #sections. */
-  scroll-padding-top: 5rem;
+  /* Leave room for the sticky header when jumping to #sections or focusing a
+     field (the header is two rows tall on phones). */
+  scroll-padding-top: 8rem;
+}
+@media (min-width: 52rem) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
 }
 body {
   min-height: 100dvh;

@@ -1,0 +1,582 @@
+---
+/**
+ * Contact page: a short form that emails Marcus (handled by worker/contact.js).
+ *
+ * Works without JavaScript (the browser posts the form and lands on
+ * /contact/sent/ or /contact/problem/). With JavaScript, fields are checked
+ * as you leave them, errors are listed at the top on submit, and the result
+ * shows in place without leaving the page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site';
+
+const services = ['A new website', 'A refresh of my current site', 'Domains and hosting', 'Updates and help', 'Not sure yet'];
+---
+
+<BaseLayout
+  title="Contact | Kiwi and Code"
+  description="Tell Marcus about your business and what you need. Quotes are free and there's no obligation."
+>
+  <section class="section theme-dark contact-page" aria-labelledby="contact-title">
+    <div class="container layout">
+      <div class="intro">
+        <p class="eyebrow">Contact</p>
+        <h1 id="contact-title">Let's talk about your website</h1>
+        <p class="lead">
+          Tell me a bit about your business and what you need. Quotes are free and there's no obligation, so it costs
+          nothing to ask.
+        </p>
+
+        <ol class="next" aria-label="What happens next">
+          <li><span aria-hidden="true">01</span>You send a message using this form.</li>
+          <li><span aria-hidden="true">02</span>I get back to you to chat about what you need.</li>
+          <li><span aria-hidden="true">03</span>You get a free quote, with no obligation.</li>
+        </ol>
+
+        <p class="alt">
+          Prefer email? Write to <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.
+        </p>
+      </div>
+
+      <div class="card theme-light">
+        <form class="form" method="post" action="/api/contact" novalidate data-contact>
+          <div class="summary" tabindex="-1" role="alert" hidden data-summary>
+            <p class="summary-title">Please check the following:</p>
+            <ul data-summary-list></ul>
+          </div>
+
+          <p class="hint-all">All fields are needed unless marked optional.</p>
+
+          <div class="field">
+            <label for="cf-name">Your name</label>
+            <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="100" />
+            <p class="error" id="cf-name-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="cf-email">Email address</label>
+            <input
+              id="cf-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              spellcheck="false"
+              required
+              maxlength="200"
+            />
+            <p class="error" id="cf-email-error" hidden></p>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="cf-phone">Phone <span class="optional">(optional)</span></label>
+              <input id="cf-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" />
+            </div>
+            <div class="field">
+              <label for="cf-business">Business name <span class="optional">(optional)</span></label>
+              <input id="cf-business" name="business" type="text" autocomplete="organization" maxlength="120" />
+            </div>
+          </div>
+
+          <fieldset class="field">
+            <legend>What do you need? <span class="optional">(optional)</span></legend>
+            <div class="chips">
+              {
+                services.map((service, i) => (
+                  <label class="chip">
+                    <input type="radio" name="service" value={service} id={`cf-service-${i}`} />
+                    <span>{service}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="cf-message">Your message</label>
+            <p class="helper" id="cf-message-help">
+              What does your business do, and what would you like your website to do for it?
+            </p>
+            <textarea
+              id="cf-message"
+              name="message"
+              rows="6"
+              required
+              minlength="10"
+              maxlength="5000"
+              aria-describedby="cf-message-help"></textarea>
+            <p class="error" id="cf-message-error" hidden></p>
+          </div>
+
+          <!-- Bot trap: hidden from people and screen readers. Leave empty. -->
+          <div class="trap" aria-hidden="true">
+            <label for="cf-website">Website</label>
+            <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          <input type="hidden" name="started" value="" data-started />
+
+          <button class="btn submit" type="submit">
+            <span class="submit-label">Send message</span>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
+              ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              ></path></svg
+            >
+          </button>
+          <p class="status" role="status" aria-live="polite" data-status></p>
+        </form>
+
+        <div class="done" tabindex="-1" hidden data-done>
+          <svg class="done-tick" viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="22"></circle>
+            <path d="M14 25l7 7 13-15"></path>
+          </svg>
+          <h2>Thanks, your message is on its way</h2>
+          <p>I'll read it and get back to you by email. If it's urgent, you can also write to {site.email}.</p>
+          <a class="btn btn--ghost" href="/">Back to the homepage</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact]');
+  const summary = document.querySelector<HTMLElement>('[data-summary]');
+  const summaryList = document.querySelector<HTMLUListElement>('[data-summary-list]');
+  const status = document.querySelector<HTMLElement>('[data-status]');
+  const done = document.querySelector<HTMLElement>('[data-done]');
+  const started = document.querySelector<HTMLInputElement>('[data-started]');
+
+  if (form && summary && summaryList && status && done) {
+    if (started) started.value = String(Date.now());
+    const button = form.querySelector<HTMLButtonElement>('.submit');
+    const label = form.querySelector('.submit-label');
+
+    // Messages written to say what's wrong and how to fix it.
+    const check = (input: HTMLInputElement | HTMLTextAreaElement): string => {
+      const value = input.value.trim();
+      switch (input.name) {
+        case 'name':
+          return value ? '' : 'Please enter your name.';
+        case 'email':
+          if (!value) return 'Please enter your email address.';
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Please enter an email address like name@example.com.';
+        case 'message':
+          return value.length >= 10 ? '' : 'Please write a little more about what you need (at least 10 characters).';
+        default:
+          return '';
+      }
+    };
+
+    const showError = (input: HTMLInputElement | HTMLTextAreaElement, message: string) => {
+      const error = document.getElementById(`${input.id}-error`);
+      if (!error) return;
+      error.textContent = message;
+      error.hidden = !message;
+      input.setAttribute('aria-invalid', message ? 'true' : 'false');
+      const describedBy = (input.getAttribute('aria-describedby') ?? '')
+        .split(' ')
+        .filter((id) => id && id !== error.id);
+      if (message) describedBy.push(error.id);
+      if (describedBy.length) input.setAttribute('aria-describedby', describedBy.join(' '));
+      else input.removeAttribute('aria-describedby');
+    };
+
+    const required = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')];
+
+    // Check a field when you leave it, then live once it has shown an error.
+    required.forEach((input) => {
+      input.addEventListener('blur', () => {
+        if (input.value.trim()) showError(input, check(input));
+      });
+      input.addEventListener('input', () => {
+        if (input.getAttribute('aria-invalid') === 'true') showError(input, check(input));
+      });
+    });
+
+    const showSummary = (problems: { input: HTMLElement; message: string }[]) => {
+      summaryList.replaceChildren(
+        ...problems.map(({ input, message }) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${input.id}`;
+          a.textContent = message;
+          a.addEventListener('click', (event) => {
+            event.preventDefault();
+            input.focus();
+          });
+          li.append(a);
+          return li;
+        }),
+      );
+      summary.hidden = false;
+      summary.focus();
+    };
+
+    const setSending = (sending: boolean) => {
+      if (!button || !label) return;
+      button.disabled = sending;
+      button.setAttribute('aria-busy', String(sending));
+      label.textContent = sending ? 'Sending…' : 'Send message';
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      status.textContent = '';
+
+      const problems = required
+        .map((input) => ({ input, message: check(input) }))
+        .filter(({ message }) => message);
+      required.forEach((input) => showError(input, check(input)));
+      if (problems.length) {
+        showSummary(problems);
+        return;
+      }
+      summary.hidden = true;
+
+      setSending(true);
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const result = await response.json().catch(() => ({ ok: false }));
+
+        if (result.ok) {
+          form.hidden = true;
+          done.hidden = false;
+          done.focus();
+          return;
+        }
+        if (result.errors) {
+          const fromServer = Object.entries(result.errors as Record<string, string>)
+            .map(([name, message]) => ({ input: form.elements.namedItem(name) as HTMLInputElement, message }))
+            .filter(({ input }) => input && 'focus' in input);
+          fromServer.forEach(({ input, message }) => showError(input, message));
+          if (fromServer.length) {
+            showSummary(fromServer);
+            return;
+          }
+        }
+        status.textContent = "Sorry, your message didn't send. Please try again, or email marcus@kiwiandcode.co.uk.";
+      } catch {
+        status.textContent = 'Sorry, your message couldn\'t be sent. Check your connection and try again.';
+      } finally {
+        setSending(false);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-page {
+    padding-top: var(--space-l);
+  }
+  .layout {
+    display: grid;
+    gap: var(--space-l);
+  }
+  @media (min-width: 60rem) {
+    .layout {
+      grid-template-columns: 1fr 1.25fr;
+      align-items: start;
+      gap: var(--space-xl);
+    }
+    .intro {
+      position: sticky;
+      top: 7rem;
+    }
+  }
+
+  .lead {
+    margin-top: var(--space-s);
+    color: var(--muted);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .next {
+    display: grid;
+    gap: var(--space-s);
+    margin-block: var(--space-l);
+    padding: 0;
+    list-style: none;
+  }
+  .next li {
+    display: flex;
+    gap: var(--space-s);
+    align-items: baseline;
+  }
+  .next span {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--kiwi);
+  }
+  .alt {
+    color: var(--muted);
+  }
+  .alt .link {
+    display: inline-block;
+    padding-block: 0.6rem;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- Form card ---------- */
+  .card {
+    padding: var(--space-m);
+    border-radius: 1.5rem;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+  @media (min-width: 40rem) {
+    .card {
+      padding: var(--space-l);
+    }
+  }
+  .form {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .hint-all {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .row {
+    display: grid;
+    gap: var(--space-m);
+  }
+  @media (min-width: 40rem) {
+    .row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  label,
+  legend {
+    font-weight: 600;
+  }
+  legend {
+    margin-bottom: 0.4rem;
+    padding: 0;
+  }
+  .optional {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .helper {
+    margin-top: -0.2rem;
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  input:not([type='radio']),
+  textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #8b928c; /* 3:1 against the card */
+    border-radius: var(--radius-s);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: max(1rem, var(--step-0)); /* 16px+ so phones don't zoom in */
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 9rem;
+  }
+  input:not([type='radio']):hover,
+  textarea:hover {
+    border-color: var(--ink);
+  }
+  input:not([type='radio']):focus-visible,
+  textarea:focus-visible {
+    border-color: var(--leaf);
+    box-shadow: 0 0 0 3px rgb(58 106 18 / 0.25);
+    outline: none;
+  }
+  [aria-invalid='true'] {
+    border-color: #b42318 !important;
+  }
+  .error {
+    display: flex;
+    gap: 0.4rem;
+    color: #b42318; /* 6:1 on the card */
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+  .error::before {
+    content: '!';
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.15em;
+    border-radius: 50%;
+    background: #b42318;
+    color: #fff;
+    font-size: 0.85em;
+  }
+  .error[hidden] {
+    display: none;
+  }
+
+  /* Service choice: radio buttons styled as tappable chips. */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chip {
+    position: relative;
+    font-weight: 500;
+  }
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid #8b928c;
+    border-radius: 999px;
+    background: #fff;
+    font-size: var(--step--1);
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+  }
+  .chip:hover span {
+    border-color: var(--ink);
+  }
+  .chip input:checked + span {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--chalk);
+  }
+  .chip input:focus-visible + span {
+    outline: 3px solid var(--leaf);
+    outline-offset: 2px;
+  }
+
+  .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .summary {
+    padding: var(--space-s) var(--space-m);
+    border: 2px solid #b42318;
+    border-radius: var(--radius-s);
+    background: #fef3f2;
+    color: var(--ink);
+  }
+  .summary:focus-visible {
+    outline: 3px solid var(--leaf);
+    outline-offset: 3px;
+  }
+  .summary-title {
+    font-weight: 700;
+  }
+  .summary ul {
+    margin-top: 0.4rem;
+    padding-left: 1.2rem;
+  }
+  .summary a {
+    display: inline-block;
+    padding-block: 0.3rem;
+    color: #b42318;
+    font-weight: 600;
+  }
+
+  .submit {
+    justify-self: start;
+    min-height: 3.5rem;
+    padding-inline: 2rem;
+  }
+  .submit[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+    transform: none;
+  }
+  .status {
+    min-height: 1.5em;
+    color: #b42318;
+    font-weight: 600;
+  }
+  .status:empty {
+    min-height: 0;
+  }
+
+  /* ---------- Sent ---------- */
+  .done {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-s);
+    outline: none;
+  }
+  .done[hidden] {
+    display: none;
+  }
+  .done-tick {
+    width: 4rem;
+    height: 4rem;
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .done-tick circle {
+    fill: var(--ink);
+    stroke: none;
+  }
+  .done-tick path {
+    stroke: var(--kiwi);
+    stroke-dasharray: 40;
+  }
+  .done p {
+    color: var(--muted);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .done:not([hidden]) .done-tick {
+      animation: pop 0.5s var(--ease-spring) both;
+    }
+    .done:not([hidden]) .done-tick path {
+      animation: tick 0.5s var(--ease-out) 0.25s both;
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+  }
+  @keyframes tick {
+    from {
+      stroke-dashoffset: 40;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

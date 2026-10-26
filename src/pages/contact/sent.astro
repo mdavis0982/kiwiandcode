@@ -1,0 +1,29 @@
+---
+/**
+ * Shown after the contact form is sent without JavaScript.
+ * (With JavaScript, the thank-you message appears on the contact page itself.)
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Message sent | Kiwi and Code" description="Thanks for getting in touch." noindex>
+  <section class="section theme-dark" aria-labelledby="sent-title">
+    <div class="container narrow">
+      <p class="eyebrow">Message sent</p>
+      <h1 id="sent-title">Thanks, your message is on its way</h1>
+      <p class="lead">I'll read it and get back to you by email.</p>
+      <a class="btn" href="/">Back to the homepage</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .narrow {
+    max-width: 40rem;
+  }
+  .lead {
+    margin-block: var(--space-s) var(--space-l);
+    color: var(--muted);
+    font-size: var(--step-1);
+  }
+</style>
