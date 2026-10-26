@@ -8,10 +8,8 @@ export const site = {
   email: 'marcus@kiwiandcode.co.uk',
   area: 'County Down, Ireland',
 
-  // Placeholder: set this to the full profile URL once the account exists,
-  // e.g. 'https://www.instagram.com/kiwiandcode'. While it's null the footer
-  // shows "Instagram coming soon" instead of a link.
-  instagram: null as string | null,
+  // Full profile URL. Set to null to show "Instagram coming soon" in the footer.
+  instagram: 'https://www.instagram.com/kiwiandcode/' as string | null,
 
   // Default SEO text, used by any page that doesn't set its own.
   title: 'Kiwi and Code | Affordable websites for small businesses in County Down, Ireland',
