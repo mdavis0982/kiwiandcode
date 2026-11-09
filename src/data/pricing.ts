@@ -1,5 +1,5 @@
 /**
- * Prices shown on the homepage. This is the one place to change them.
+ * All prices on the site come from this file. This is the one place to change them.
  * Full price list (with extras and payment terms) lives in the Kiwi and Code
  * Price List doc; keep the two in step.
  */
@@ -58,27 +58,19 @@ export const formatPrice = (pounds: number) => `£${pounds.toLocaleString('en-GB
 export const showOffer = offer.active && offer.spotsLeft > 0;
 
 /**
- * Pay monthly option, open to any business, shown on /pricing/ next to
- * paying once. A small setup fee, then a monthly fee that covers the build,
- * hosting and upkeep. `oneOff` is the pay-once alternative (Standard).
+ * Spread the cost: any package can be paid over 12 months instead of up
+ * front. A deposit to start, then 12 equal payments once the site is live.
+ * The payments end after 12 months and the site is fully the client's.
+ * Spreading adds a small flat fee. Care plans are separate and optional.
  */
-export const monthlyPlan = {
-  setup: 95,
-  monthly: 55,
-  minMonths: 12,
-  oneOff: 695,
-  monthlyIncludes: [
-    'Your site designed and built, up to 5 pages',
-    'Contact form, map, and booking or enquiry button',
-    'Hosting, security updates and backups',
-    'Up to 30 minutes of changes every month',
-    'Google Business Profile set up',
-  ],
-  oneOffIncludes: [
-    'The same site, paid for once',
-    'Contact form, map, and booking or enquiry button',
-    'Google Business Profile set up',
-    '3 rounds of changes before it goes live',
-    'Optional care plan afterwards, from £25 a month',
-  ],
+export const spread = {
+  deposit: 95,
+  months: 12,
+  fee: 60,
 };
+
+/** Monthly payment when a price is spread over 12 months (rounded up to £1). */
+export const monthlyFor = (price: number) => Math.ceil((price + spread.fee - spread.deposit) / spread.months);
+
+/** Total paid when spreading a price over 12 months. */
+export const spreadTotal = (price: number) => spread.deposit + monthlyFor(price) * spread.months;

@@ -1,11 +1,24 @@
 ---
 /**
- * The full price list: founding offer banner, the three packages and the
- * care plans. Used on the /pricing/ page. Prices come from src/data/pricing.ts.
+ * The full price list: founding offer banner, a "pay once / spread over 12
+ * months" switch, the three packages and the care plans. Used on the
+ * /pricing/ page. Prices come from src/data/pricing.ts.
  *
+ * The switch is two radio buttons and works with CSS alone (:has): each card
+ * holds both prices and the chosen one slides into place.
  * On desktop, a soft kiwi glow follows the cursor around each card's border.
  */
-import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+import {
+  packages,
+  carePlans,
+  offer,
+  offerPrice,
+  formatPrice,
+  showOffer,
+  spread,
+  monthlyFor,
+  spreadTotal,
+} from '../../data/pricing';
 
 interface Props {
   /** 1 when this is the main heading of the page. */
@@ -52,6 +65,15 @@ const Sub = level === 1 ? 'h2' : 'h3';
       }
     </div>
 
+    <fieldset class="switch" data-reveal>
+      <legend class="visually-hidden">How would you like to pay?</legend>
+      <input type="radio" name="pay" id="pay-once" value="once" checked />
+      <label for="pay-once">Pay once</label>
+      <input type="radio" name="pay" id="pay-spread" value="spread" />
+      <label for="pay-spread">Spread over {spread.months} months</label>
+      <span class="switch-pill" aria-hidden="true"></span>
+    </fieldset>
+
     <ul class="plans">
       {
         packages.map((pkg, i) => (
@@ -60,23 +82,49 @@ const Sub = level === 1 ? 'h2' : 'h3';
               <Sub class="plan-name">{pkg.name}</Sub>
               {pkg.popular && <span class="popular">Most popular</span>}
             </div>
-            <p class="price">
-              <span class="from">from</span>
-              {showOffer ? (
-                <>
-                  <del>
-                    <span class="visually-hidden">was </span>
-                    {formatPrice(pkg.price)}
-                  </del>
-                  <span class="now">
-                    <span class="visually-hidden">now </span>
-                    {formatPrice(offerPrice(pkg.price))}
-                  </span>
-                </>
-              ) : (
-                <span class="now">{formatPrice(pkg.price)}</span>
-              )}
-            </p>
+            <div class="price-wrap">
+              <p class="price is-once">
+                <span class="from">from</span>
+                {showOffer ? (
+                  <>
+                    <del>
+                      <span class="visually-hidden">was </span>
+                      {formatPrice(pkg.price)}
+                    </del>
+                    <span class="now">
+                      <span class="visually-hidden">now </span>
+                      {formatPrice(offerPrice(pkg.price))}
+                    </span>
+                  </>
+                ) : (
+                  <span class="now">{formatPrice(pkg.price)}</span>
+                )}
+              </p>
+              <p class="price is-spread">
+                <span class="from">from</span>
+                {showOffer ? (
+                  <>
+                    <del>
+                      <span class="visually-hidden">was </span>
+                      {formatPrice(monthlyFor(pkg.price))}
+                    </del>
+                    <span class="now">
+                      <span class="visually-hidden">now </span>
+                      {formatPrice(monthlyFor(offerPrice(pkg.price)))}
+                    </span>
+                  </>
+                ) : (
+                  <span class="now">{formatPrice(monthlyFor(pkg.price))}</span>
+                )}
+                <span class="per">/month</span>
+              </p>
+            </div>
+            <div class="note-wrap">
+              <p class="price-note is-once">Half up front, half when your site is live.</p>
+              <p class="price-note is-spread">
+                {formatPrice(spread.deposit)} to start, then {spread.months} payments. {formatPrice(spreadTotal(showOffer ? offerPrice(pkg.price) : pkg.price))} in total, then it's paid off.
+              </p>
+            </div>
             <p class="best">{pkg.bestFor}</p>
             <ul class="features">
               {pkg.features.map((feature) => (
@@ -96,7 +144,7 @@ const Sub = level === 1 ? 'h2' : 'h3';
     <div class="care" data-reveal>
       <div class="care-intro">
         <Sub class="care-title">Care plans</Sub>
-        <p>Optional upkeep so your site stays secure and current. Cancel any time with a month's notice.</p>
+        <p>Optional, once your site is live, however you paid for it. Cancel any time with a month's notice.</p>
       </div>
       <ul class="care-list">
         {
@@ -183,6 +231,92 @@ const Sub = level === 1 ? 'h2' : 'h3';
   .pip.is-free {
     background: var(--coral);
     border-color: var(--coral);
+  }
+
+  /* ---------- Pay once / spread switch ---------- */
+  .switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 26rem;
+    margin: 0 0 var(--space-m);
+    padding: 0.3rem;
+    border: 1px solid var(--ink-line);
+    border-radius: 999px;
+    background: var(--ink-raised);
+  }
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .switch label {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: var(--step--1);
+    text-align: center;
+    color: var(--mist);
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .switch input:checked + label {
+    color: var(--ink);
+  }
+  .switch input:focus-visible + label {
+    outline: 3px solid var(--kiwi);
+    outline-offset: 3px;
+  }
+  .switch-pill {
+    position: absolute;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    left: 0.3rem;
+    width: calc(50% - 0.3rem);
+    border-radius: 999px;
+    background: var(--kiwi);
+    transition: transform 0.45s var(--ease-spring);
+  }
+  .pricing:has(#pay-spread:checked) .switch-pill {
+    transform: translateX(100%);
+  }
+
+  /* Both prices sit in the same spot; the chosen one slides in. */
+  .price-wrap,
+  .note-wrap {
+    display: grid;
+  }
+  .price-wrap > *,
+  .note-wrap > * {
+    grid-area: 1 / 1;
+    transition:
+      opacity 0.35s var(--ease-out),
+      transform 0.45s var(--ease-out),
+      visibility 0.45s;
+  }
+  .pricing:has(#pay-once:checked) .is-spread,
+  .pricing:has(#pay-spread:checked) .is-once {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.6em);
+  }
+  .per {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--mist);
+  }
+  .note-wrap {
+    grid-column: 1 / -1;
+    margin-top: 0.35rem;
+  }
+  .price-note {
+    font-size: var(--step--1);
+    color: var(--mist);
   }
 
   /* ---------- Packages ---------- */
@@ -377,6 +511,9 @@ const Sub = level === 1 ? 'h2' : 'h3';
       justify-content: flex-start;
       margin-top: 0.35rem;
     }
+    .note-wrap {
+      margin-top: 0.5rem;
+    }
     .now {
       font-size: var(--step-3);
     }
@@ -472,7 +609,10 @@ const Sub = level === 1 ? 'h2' : 'h3';
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .plan {
+    .plan,
+    .switch-pill,
+    .price-wrap > *,
+    .note-wrap > * {
       transition: none;
     }
   }

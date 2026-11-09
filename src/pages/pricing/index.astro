@@ -1,16 +1,18 @@
 ---
 /**
- * Prices page: the full price list, the pay monthly / pay once switch (open
- * to every business), common questions and a closing call to action.
+ * Prices page: the full price list (with the pay once / spread over 12 months
+ * switch), common questions and a closing call to action.
  * Prices come from src/data/pricing.ts.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Pricing from '../../components/home/Pricing.astro';
 import Faq from '../../components/shared/Faq.astro';
 import ContactPanel from '../../components/shared/ContactPanel.astro';
-import PlanSwitch from '../../components/shared/PlanSwitch.astro';
 import { links } from '../../data/site';
-import { offer, showOffer, monthlyPlan, formatPrice } from '../../data/pricing';
+import { offer, showOffer, formatPrice, spread, carePlans, packages, monthlyFor, spreadTotal } from '../../data/pricing';
+
+const standard = packages.find((p) => p.popular) ?? packages[0];
+const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
 
 const faqs = [
   {
@@ -19,7 +21,7 @@ const faqs = [
   },
   {
     q: 'How do I pay?',
-    a: "Half up front once we've agreed the plan, and the other half when your site is finished and you're happy with it.",
+    a: `Either pay once: half up front when we've agreed the plan, and half when your site is finished and you're happy with it. Or spread it: ${formatPrice(spread.deposit)} to start, then ${spread.months} monthly payments.`,
   },
   {
     q: 'Who owns the website?',
@@ -30,8 +32,12 @@ const faqs = [
     a: "Your domain name, usually around £10 to £20 a year, paid straight to the provider. Hosting for most small sites is free or very cheap, and I'll tell you exactly what to expect before you commit.",
   },
   {
-    q: 'How does paying monthly work?',
-    a: `You pay ${formatPrice(monthlyPlan.setup)} to set up, then ${formatPrice(monthlyPlan.monthly)} a month for at least ${monthlyPlan.minMonths} months. That covers the build, hosting, backups and small changes. After that it carries on month to month, and you can cancel with a month's notice.`,
+    q: 'How does spreading the cost work?',
+    a: `You pay ${formatPrice(spread.deposit)} to start, then ${spread.months} monthly payments once your site is live. For example, the ${standard.name} package is ${formatPrice(monthlyFor(standard.price))} a month, ${formatPrice(spreadTotal(standard.price))} in total instead of ${formatPrice(standard.price)} up front. Spreading adds a flat ${formatPrice(spread.fee)}.`,
+  },
+  {
+    q: 'What happens after the 12 months?',
+    a: `Your payments stop and the site is paid off. From then on you can add a care plan from ${formatPrice(lowestCare)} a month, or not. It's up to you.`,
   },
   {
     q: 'Do I need a care plan?',
@@ -54,11 +60,9 @@ const faqs = [
 
 <BaseLayout
   title="Prices | Kiwi and Code"
-  description="Website prices for small businesses in County Down: one-page sites from £395, up to 5 pages from £695, shops and booking from £1,195. Or pay monthly from £55 a month."
+  description="Website prices for small businesses in County Down: one-page sites from £395, up to 5 pages from £695, shops and booking from £1,195. Or spread the cost over 12 months."
 >
   <Pricing level={1} />
-
-  <PlanSwitch />
 
   <Faq items={faqs} title="Questions about prices" />
 
