@@ -10,13 +10,13 @@
  *   "new booking" note slides in.
  *
  * Prices aren't shown here: the page links to /pricing/, which has the
- * pay monthly / pay once switch.
+ * pay once / spread over 12 months switch.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Faq from '../../components/shared/Faq.astro';
 import ContactPanel from '../../components/shared/ContactPanel.astro';
 import { links } from '../../data/site';
-import { packages, monthlyPlan, formatPrice } from '../../data/pricing';
+import { packages, monthlyFor, formatPrice } from '../../data/pricing';
 
 const ptExample = '/examples/personal-trainer/';
 
@@ -90,7 +90,7 @@ const faqs = [
   },
   {
     q: 'How much does it cost?',
-    a: `The same as any other business: sites start from ${formatPrice(lowest)}, or you can pay monthly from ${formatPrice(monthlyPlan.monthly)} a month. Every quote is free and fixed before we start.`,
+    a: `The same as any other business: sites start from ${formatPrice(lowest)}, or spread over 12 months from ${formatPrice(monthlyFor(lowest))} a month. Every quote is free and fixed before we start.`,
   },
   {
     q: 'Do I get a demo first?',
@@ -129,7 +129,7 @@ const faqs = [
         </div>
         <ul class="perks">
           <li>Free demo, no obligation</li>
-          <li>Pay once or monthly</li>
+          <li>Pay once or spread it out</li>
           <li>Your domain, in your name</li>
         </ul>
       </div>
@@ -250,8 +250,8 @@ const faqs = [
     <div class="container pointer" data-reveal>
       <div>
         <p class="eyebrow">Prices</p>
-        <h2 id="g-prices">Simple prices, pay once or monthly</h2>
-        <p>The same prices as any other business. Pay up front, or spread the cost with a monthly plan.</p>
+        <h2 id="g-prices">Simple prices, pay once or spread it out</h2>
+        <p>The same prices as any other business. Pay up front, or spread the cost over 12 months.</p>
       </div>
       <a class="btn" href={links.pricing}>
         See prices

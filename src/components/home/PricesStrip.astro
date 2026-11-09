@@ -6,7 +6,7 @@
  */
 import ContactPanel from '../shared/ContactPanel.astro';
 import { links } from '../../data/site';
-import { packages, carePlans, monthlyPlan, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+import { packages, carePlans, monthlyFor, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
 
 const lowest = Math.min(...packages.map((p) => p.price));
 const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
@@ -36,7 +36,7 @@ const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
         <li data-reveal style="--delay: 80ms">
           <a href={links.pricing}>
             <span class="k">All prices</span>
-            <span class="t">Pay once, or monthly from {formatPrice(monthlyPlan.monthly)} a month</span>
+            <span class="t">Pay once, or spread it over 12 months from {formatPrice(monthlyFor(lowest))} a month</span>
             <span class="a" aria-hidden="true">&rarr;</span>
           </a>
         </li>
