@@ -6,7 +6,7 @@
  */
 import ContactPanel from '../shared/ContactPanel.astro';
 import { links } from '../../data/site';
-import { packages, carePlans, gymPlan, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+import { packages, carePlans, monthlyPlan, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
 
 const lowest = Math.min(...packages.map((p) => p.price));
 const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
@@ -36,14 +36,14 @@ const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
         <li data-reveal style="--delay: 80ms">
           <a href={links.pricing}>
             <span class="k">All prices</span>
-            <span class="t">Packages, care plans and common questions</span>
+            <span class="t">Pay once, or monthly from {formatPrice(monthlyPlan.monthly)} a month</span>
             <span class="a" aria-hidden="true">&rarr;</span>
           </a>
         </li>
         <li data-reveal style="--delay: 160ms">
           <a href={links.gyms}>
             <span class="k">Gyms &amp; PTs</span>
-            <span class="t">Pay monthly: {formatPrice(gymPlan.monthly)} a month, {formatPrice(gymPlan.setup)} to set up</span>
+            <span class="t">What I can do for gyms and personal trainers</span>
             <span class="a" aria-hidden="true">&rarr;</span>
           </a>
         </li>

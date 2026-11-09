@@ -1,15 +1,16 @@
 ---
 /**
- * Prices page: the full price list, a pointer to the monthly plan for gyms
- * and PTs, common questions and a closing call to action.
+ * Prices page: the full price list, the pay monthly / pay once switch (open
+ * to every business), common questions and a closing call to action.
  * Prices come from src/data/pricing.ts.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Pricing from '../../components/home/Pricing.astro';
 import Faq from '../../components/shared/Faq.astro';
 import ContactPanel from '../../components/shared/ContactPanel.astro';
+import PlanSwitch from '../../components/shared/PlanSwitch.astro';
 import { links } from '../../data/site';
-import { offer, showOffer, gymPlan, formatPrice } from '../../data/pricing';
+import { offer, showOffer, monthlyPlan, formatPrice } from '../../data/pricing';
 
 const faqs = [
   {
@@ -27,6 +28,10 @@ const faqs = [
   {
     q: 'Are there any other costs?',
     a: "Your domain name, usually around £10 to £20 a year, paid straight to the provider. Hosting for most small sites is free or very cheap, and I'll tell you exactly what to expect before you commit.",
+  },
+  {
+    q: 'How does paying monthly work?',
+    a: `You pay ${formatPrice(monthlyPlan.setup)} to set up, then ${formatPrice(monthlyPlan.monthly)} a month for at least ${monthlyPlan.minMonths} months. That covers the build, hosting, backups and small changes. After that it carries on month to month, and you can cancel with a month's notice.`,
   },
   {
     q: 'Do I need a care plan?',
@@ -49,22 +54,11 @@ const faqs = [
 
 <BaseLayout
   title="Prices | Kiwi and Code"
-  description="Website prices for small businesses in County Down: one-page sites from £395, up to 5 pages from £695, shops and booking from £1,195. Optional care plans from £25 a month."
+  description="Website prices for small businesses in County Down: one-page sites from £395, up to 5 pages from £695, shops and booking from £1,195. Or pay monthly from £55 a month."
 >
   <Pricing level={1} />
 
-  <section class="theme-dark gym-band" aria-label="Monthly plan for gyms and personal trainers">
-    <div class="container">
-      <a class="gym-link" href={links.gyms} data-reveal>
-        <span class="gym-tag">Gyms &amp; PTs</span>
-        <span class="gym-text">
-          Run a gym or train clients? Pay monthly instead:{' '}
-          <strong>{formatPrice(gymPlan.monthly)} a month</strong>, plus {formatPrice(gymPlan.setup)} to set up.
-        </span>
-        <span class="gym-arrow" aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  </section>
+  <PlanSwitch />
 
   <Faq items={faqs} title="Questions about prices" />
 
@@ -76,54 +70,6 @@ const faqs = [
 </BaseLayout>
 
 <style>
-  .gym-band {
-    /* Sits straight under the price list, which is also dark. Positioned so it
-       paints above that section. */
-    position: relative;
-    margin-top: calc(var(--space-m) - var(--space-xl));
-    padding-bottom: var(--space-xl);
-  }
-  .gym-link {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.6rem 1rem;
-    padding: 1rem 1.2rem;
-    border: 1px solid var(--ink-line);
-    border-radius: var(--radius);
-    background: linear-gradient(100deg, rgb(155 225 93 / 0.14), transparent 70%), var(--ink-raised);
-    color: var(--chalk);
-    text-decoration: none;
-    transition:
-      border-color 0.25s,
-      transform 0.3s var(--ease-out);
-  }
-  .gym-link:hover {
-    border-color: var(--kiwi);
-  }
-  .gym-tag {
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
-    background: var(--kiwi);
-    color: var(--ink);
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: 700;
-  }
-  .gym-text {
-    flex: 1 1 16rem;
-  }
-  .gym-text strong {
-    color: var(--lime);
-  }
-  .gym-arrow {
-    font-size: var(--step-1);
-    color: var(--kiwi);
-    transition: transform 0.3s var(--ease-spring);
-  }
-  .gym-link:hover .gym-arrow {
-    transform: translateX(4px);
-  }
   .closing {
     padding-top: var(--space-l);
   }

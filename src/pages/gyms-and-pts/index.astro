@@ -1,23 +1,22 @@
 ---
 /**
  * Gyms and personal trainers: a landing page for Marcus's fitness niche,
- * with a monthly plan. Linked in the menu and in outreach messages.
+ * showing what he can do for PTs and gyms. Linked in the menu and in
+ * outreach messages.
  *
  * Animations (all calm on phones, off with reduced motion):
  * - Headline lines wipe in on load (.wipe in global.css).
  * - Desktop: the example timetable's classes pop in and fill up, then a
  *   "new booking" note slides in.
- * - Pay monthly / pay once switch: the price digits roll like an odometer.
- *   The switch is two radio buttons and works with CSS alone (:has), so it
- *   needs no JavaScript.
  *
- * Plan prices come from `gymPlan` in src/data/pricing.ts.
+ * Prices aren't shown here: the page links to /pricing/, which has the
+ * pay monthly / pay once switch.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Faq from '../../components/shared/Faq.astro';
 import ContactPanel from '../../components/shared/ContactPanel.astro';
 import { links } from '../../data/site';
-import { gymPlan, carePlans, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+import { packages, monthlyPlan, formatPrice } from '../../data/pricing';
 
 const ptExample = '/examples/personal-trainer/';
 
@@ -30,19 +29,7 @@ const days = [
   { day: 'Fri', slots: [{ t: '06:30', c: 'HIIT', f: 55 }, { t: '17:30', c: 'Circuits', f: 30 }] },
 ];
 
-// ---- Odometer digits for the price switch ----
-// Both prices are padded to the same number of digits; a blank (10) collapses.
-const toDigits = (n: number, len: number) =>
-  String(n)
-    .padStart(len, ' ')
-    .split('')
-    .map((d) => (d === ' ' ? 10 : Number(d)));
-const len = Math.max(String(gymPlan.monthly).length, String(gymPlan.oneOff).length);
-const monthlyDigits = toDigits(gymPlan.monthly, len);
-const onceDigits = toDigits(gymPlan.oneOff, len);
-const reel = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
+const lowest = Math.min(...packages.map((p) => p.price));
 
 const problems = [
   {
@@ -94,10 +81,6 @@ const features = [
 
 const faqs = [
   {
-    q: 'What happens after the first 12 months?',
-    a: "You can keep going month to month, and cancel any time after that with a month's notice.",
-  },
-  {
     q: 'I already use a booking app. Can I keep it?',
     a: "Yes. Your site links straight to the app you already use, so nothing changes for your members. If you don't have one, I can set up a simple booking or enquiry form.",
   },
@@ -106,8 +89,8 @@ const faqs = [
     a: "Phone photos are fine to start with, and I'll help you pick the best ones. You can swap in better ones later at no extra cost.",
   },
   {
-    q: 'Is pay monthly or pay once better?',
-    a: `Pay monthly costs less up front and includes hosting and changes. Paying once costs more at the start but is cheaper over time, with an optional care plan from ${formatPrice(lowestCare)} a month.`,
+    q: 'How much does it cost?',
+    a: `The same as any other business: sites start from ${formatPrice(lowest)}, or you can pay monthly from ${formatPrice(monthlyPlan.monthly)} a month. Every quote is free and fixed before we start.`,
   },
   {
     q: 'Do I get a demo first?',
@@ -118,7 +101,7 @@ const faqs = [
 
 <BaseLayout
   title="Websites for gyms and personal trainers in County Down | Kiwi and Code"
-  description={`Websites for gyms, personal trainers and fitness studios in County Down. Timetable, prices and booking in one place, from ${formatPrice(gymPlan.monthly)} a month.`}
+  description={`Websites for gyms, personal trainers and fitness studios in County Down. Timetable, prices and booking in one place, built by a local developer.`}
 >
   <!-- ============ Hero ============ -->
   <section class="g-hero theme-dark" aria-labelledby="g-title">
@@ -146,7 +129,7 @@ const faqs = [
         </div>
         <ul class="perks">
           <li>Free demo, no obligation</li>
-          <li>From {formatPrice(gymPlan.monthly)} a month</li>
+          <li>Pay once or monthly</li>
           <li>Your domain, in your name</li>
         </ul>
       </div>
@@ -253,8 +236,8 @@ const faqs = [
         <span class="ex-bar" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="ex-screen" aria-hidden="true">
           <span class="ex-brand">Caitlin<b>.</b></span>
-          <span class="ex-line">Stronger,</span>
-          <span class="ex-line ex-line--volt">every week.</span>
+          <span class="ex-line">Stronger than</span>
+          <span class="ex-line ex-line--volt">last week.</span>
           <span class="ex-btn">Book a free chat</span>
         </span>
         <span class="ex-label">Example design</span>
@@ -262,90 +245,21 @@ const faqs = [
     </div>
   </section>
 
-  <!-- ============ Plan ============ -->
-  <section class="section theme-dark" aria-labelledby="g-plan">
-    <div class="container plan-wrap">
-      <div class="section-head" data-reveal>
+  <!-- ============ Prices pointer ============ -->
+  <section class="section theme-dark prices-pointer" aria-labelledby="g-prices">
+    <div class="container pointer" data-reveal>
+      <div>
         <p class="eyebrow">Prices</p>
-        <h2 id="g-plan">Pay monthly, or pay once</h2>
-        <p>Pick whichever suits your cash flow. Same site either way.</p>
+        <h2 id="g-prices">Simple prices, pay once or monthly</h2>
+        <p>The same prices as any other business. Pay up front, or spread the cost with a monthly plan.</p>
       </div>
-
-      <div class="plan" data-reveal>
-        <fieldset class="switch">
-          <legend class="visually-hidden">How would you like to pay?</legend>
-          <input type="radio" name="billing" id="bill-monthly" value="monthly" checked />
-          <label for="bill-monthly">Pay monthly</label>
-          <input type="radio" name="billing" id="bill-once" value="once" />
-          <label for="bill-once">Pay once</label>
-          <span class="switch-pill" aria-hidden="true"></span>
-        </fieldset>
-
-        <div class="price-row">
-          <p class="big" aria-hidden="true">
-            <span class="once-only from">from</span>
-            <span class="cur">£</span>
-            {
-              monthlyDigits.map((m, c) => (
-                <span
-                  class="digit"
-                  style={`--m: ${m}; --o: ${onceDigits[c]}; --c: ${c}; --mw: ${m === 10 ? 0 : 1}; --ow: ${onceDigits[c] === 10 ? 0 : 1}`}
-                >
-                  <span class="reel">
-                    {reel.map((d) => (
-                      <span>{d}</span>
-                    ))}
-                    <span />
-                  </span>
-                </span>
-              ))
-            }
-            <span class="per monthly-only">/month</span>
-            <span class="per once-only">one-off</span>
-          </p>
-          <p class="visually-hidden monthly-only">{formatPrice(gymPlan.monthly)} a month</p>
-          <p class="visually-hidden once-only">From {formatPrice(gymPlan.oneOff)}, paid once</p>
-          <p class="price-note monthly-only">
-            Plus {formatPrice(gymPlan.setup)} to set up. {gymPlan.minMonths}-month minimum, then month to month.
-          </p>
-          <p class="price-note once-only">
-            Half up front, half when it's finished.
-            {
-              showOffer && (
-                <span class="offer-note">
-                  Founding offer: from {formatPrice(offerPrice(gymPlan.oneOff))} for my first {offer.spotsTotal} clients.
-                </span>
-              )
-            }
-          </p>
-        </div>
-
-        <ul class="incl monthly-only">
-          {
-            gymPlan.monthlyIncludes.map((item) => (
-              <li>
-                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10.5 3 3 7-7" /></svg>
-                {item}
-              </li>
-            ))
-          }
-        </ul>
-        <ul class="incl once-only">
-          {
-            gymPlan.oneOffIncludes.map((item) => (
-              <li>
-                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10.5 3 3 7-7" /></svg>
-                {item}
-              </li>
-            ))
-          }
-        </ul>
-
-        <a class="btn plan-cta" href={links.contact}>Get a free demo first</a>
-      </div>
-      <p class="all-prices" data-reveal>
-        Need something bigger, like an online shop? <a class="link" href={links.pricing}>See all prices</a>.
-      </p>
+      <a class="btn" href={links.pricing}>
+        See prices
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
+          ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          ></path></svg
+        >
+      </a>
     </div>
   </section>
 
@@ -657,185 +571,26 @@ const faqs = [
     color: #b6b3c0;
   }
 
-  /* ================= Plan switch ================= */
-  .plan-wrap .section-head {
-    margin-inline: auto;
-    text-align: center;
-  }
-  .plan {
-    max-width: 34rem;
-    margin-inline: auto;
+  .pointer {
+    display: grid;
+    gap: var(--space-m);
+    align-items: center;
     padding: var(--space-m) 1.25rem;
-    border: 1px solid var(--kiwi);
-    border-radius: 1.5rem;
-    background: radial-gradient(ellipse 90% 60% at 50% 0%, rgb(155 225 93 / 0.14), transparent 70%), var(--ink-raised);
-    box-shadow: 0 30px 80px -40px rgb(155 225 93 / 0.4);
-  }
-
-  .switch {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: 0 auto var(--space-m);
-    padding: 0.3rem;
     border: 1px solid var(--ink-line);
-    border-radius: 999px;
-    background: var(--ink);
-    max-width: 20rem;
+    border-radius: 1.5rem;
+    background: radial-gradient(ellipse 60% 90% at 100% 0%, rgb(155 225 93 / 0.14), transparent 70%), var(--ink-raised);
   }
-  .switch input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .switch label {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    min-height: 2.75rem;
-    border-radius: 999px;
-    font-weight: 600;
-    cursor: pointer;
+  .pointer p:not(.eyebrow) {
+    margin-top: var(--space-xs);
     color: var(--mist);
-    transition: color 0.3s;
+    max-width: 38rem;
   }
-  .switch input:checked + label {
-    color: var(--ink);
+  .pointer h2 {
+    font-size: var(--step-2);
   }
-  .switch input:focus-visible + label {
-    outline: 3px solid var(--kiwi);
-    outline-offset: 3px;
+  .prices-pointer {
+    padding-block: var(--space-l);
   }
-  .switch-pill {
-    position: absolute;
-    top: 0.3rem;
-    bottom: 0.3rem;
-    left: 0.3rem;
-    width: calc(50% - 0.3rem);
-    border-radius: 999px;
-    background: var(--kiwi);
-    transition: transform 0.45s var(--ease-spring);
-  }
-  .plan:has(#bill-once:checked) .switch-pill {
-    transform: translateX(100%);
-  }
-
-  /* Show the right words for the chosen option. */
-  .plan:has(#bill-monthly:checked) .once-only,
-  .plan:has(#bill-once:checked) .monthly-only {
-    display: none;
-  }
-
-  .price-row {
-    text-align: center;
-  }
-  .big {
-    display: inline-flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 0.05em;
-    font-family: var(--font-heading);
-    font-weight: 800;
-    font-size: clamp(3.2rem, 2.4rem + 4vw, 4.75rem);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .cur {
-    font-size: 0.6em;
-    color: var(--kiwi);
-    align-self: flex-start;
-    margin-top: 0.15em;
-  }
-  .from,
-  .per {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: 400;
-    color: var(--mist);
-  }
-  .from {
-    align-self: center;
-    margin-right: 0.4rem;
-  }
-  .per {
-    margin-left: 0.3rem;
-  }
-
-  /* Odometer: each digit is a reel of 0-9 plus a blank, shifted up to the
-     right number. Widths collapse for blank digits. */
-  .digit {
-    display: inline-block;
-    height: 1em;
-    width: calc(var(--mw) * 0.58em);
-    overflow: hidden;
-    transition: width 0.5s var(--ease-out);
-  }
-  .reel {
-    display: flex;
-    flex-direction: column;
-    transform: translateY(calc(var(--m) * -1em));
-    transition: transform 0.7s var(--ease-spring);
-    transition-delay: calc(var(--c) * 70ms);
-  }
-  .reel > span {
-    display: block;
-    height: 1em;
-    width: 0.58em;
-    text-align: center;
-  }
-  .plan:has(#bill-once:checked) .digit {
-    width: calc(var(--ow) * 0.58em);
-  }
-  .plan:has(#bill-once:checked) .reel {
-    transform: translateY(calc(var(--o) * -1em));
-  }
-
-  .price-note {
-    margin-top: 0.6rem;
-    color: var(--mist);
-    font-size: var(--step--1);
-  }
-  .offer-note {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--peach);
-  }
-
-  .incl {
-    display: grid;
-    gap: 0.5rem;
-    margin-top: var(--space-m);
-    padding: var(--space-m) 0 0;
-    border-top: 1px solid var(--ink-line);
-    list-style: none;
-  }
-  .incl li {
-    display: flex;
-    gap: 0.55rem;
-    align-items: flex-start;
-  }
-  .incl svg {
-    flex: none;
-    width: 1.15rem;
-    height: 1.15rem;
-    margin-top: 0.2rem;
-    fill: none;
-    stroke: var(--kiwi);
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .plan-cta {
-    width: 100%;
-    margin-top: var(--space-m);
-  }
-  .all-prices {
-    margin-top: var(--space-m);
-    text-align: center;
-    color: var(--mist);
-  }
-
   .closing {
     padding-top: 0;
   }
@@ -914,8 +669,9 @@ const faqs = [
       grid-template-columns: 1fr 1fr;
       gap: var(--space-xl);
     }
-    .plan {
-      padding: var(--space-l);
+    .pointer {
+      grid-template-columns: 1fr auto;
+      gap: var(--space-l);
     }
   }
 
@@ -982,11 +738,4 @@ const faqs = [
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .reel,
-    .digit,
-    .switch-pill {
-      transition: none;
-    }
-  }
 </style>

@@ -58,25 +58,25 @@ export const formatPrice = (pounds: number) => `£${pounds.toLocaleString('en-GB
 export const showOffer = offer.active && offer.spotsLeft > 0;
 
 /**
- * Monthly plan for gyms and personal trainers, shown on /gyms-and-pts/.
- * A small setup fee, then a monthly fee that covers the build, hosting
- * and upkeep. `oneOff` is the pay-once alternative (the Standard package).
+ * Pay monthly option, open to any business, shown on /pricing/ next to
+ * paying once. A small setup fee, then a monthly fee that covers the build,
+ * hosting and upkeep. `oneOff` is the pay-once alternative (Standard).
  */
-export const gymPlan = {
+export const monthlyPlan = {
   setup: 95,
   monthly: 55,
   minMonths: 12,
   oneOff: 695,
   monthlyIncludes: [
     'Your site designed and built, up to 5 pages',
-    'Class timetable, prices and a booking button',
+    'Contact form, map, and booking or enquiry button',
     'Hosting, security updates and backups',
     'Up to 30 minutes of changes every month',
     'Google Business Profile set up',
   ],
   oneOffIncludes: [
     'The same site, paid for once',
-    'Class timetable, prices and a booking button',
+    'Contact form, map, and booking or enquiry button',
     'Google Business Profile set up',
     '3 rounds of changes before it goes live',
     'Optional care plan afterwards, from £25 a month',

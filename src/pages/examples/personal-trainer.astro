@@ -2,11 +2,11 @@
 /**
  * Example site: Caitlin, a made-up personal trainer from Carryduff. Like the
  * bakery, it's a one-page demo and meant to be a bit showy: slide-in headline,
- * a "workout tracker" card, a goal picker that redraws a sample week, and
- * confetti on the booking button.
+ * a "workout tracker" card, a client progress chart that draws itself, a goal
+ * picker that redraws a sample week, numbers that count up, and a booking
+ * picker (day + time) that ends in confetti.
  *
- * The business, prices and reviews are invented. The photo spot is a
- * placeholder until there's a real photo to drop in.
+ * The business, prices, stats and reviews are invented.
  */
 import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/inter/wght.css';
@@ -70,6 +70,30 @@ const reviews = [
   { quote: 'Down a dress size and up 40kg on my deadlift. Best decision I made all year.', name: 'Sarah, 41' },
 ];
 
+const stats = [
+  { prefix: '', value: 48, suffix: '', label: 'clients coached so far' },
+  { prefix: '+', value: 40, suffix: 'kg', label: "on Sarah's deadlift in 16 weeks" },
+  { prefix: '', value: 96, suffix: '%', label: 'still training after 3 months' },
+];
+
+// Booking picker: free times per day (the rest show as taken).
+const slotTimes = ['07:00', '09:30', '12:00', '17:30', '18:30', '19:30'];
+const freeSlots: Record<string, string[]> = {
+  Mon: ['07:00', '12:00', '18:30'],
+  Tue: ['09:30', '17:30', '18:30', '19:30'],
+  Wed: ['07:00', '19:30'],
+  Thu: ['09:30', '12:00', '17:30'],
+  Fri: ['07:00', '09:30', '12:00'],
+  Sat: ['09:30', '12:00'],
+};
+const bookDays = Object.keys(freeSlots);
+
+// Sarah's deadlift, week by week (kg), for the hero progress chart.
+const lifts = [40, 42, 45, 44, 50, 53, 56, 57, 61, 60, 65, 67, 70, 70, 75, 80];
+const chartPoints = lifts.map((kg, i) => `${((i / (lifts.length - 1)) * 200).toFixed(1)} ${(95 - ((kg - 35) / 50) * 85).toFixed(1)}`);
+const chartLine = `M${chartPoints.join(' L')}`;
+const chartArea = `${chartLine} L200 100 L0 100 Z`;
+
 const headline = [
   { text: 'Stronger', style: 'solid' },
   { text: 'than', style: 'outline' },
@@ -123,10 +147,17 @@ const headline = [
           <div class="glow"></div>
 
           <div class="photo">
-            <span class="photo-initial">C</span>
-            <span class="photo-note">Photo of Caitlin here</span>
+            <p class="progress-label">Client progress</p>
+            <p class="progress-title">Sarah's deadlift</p>
+            <svg class="chart" viewBox="0 0 200 100" preserveAspectRatio="none">
+              <path class="chart-area" d={chartArea} />
+              <path class="chart-line" d={chartLine} pathLength="100" />
+            </svg>
+            <p class="chart-axis"><span>Week 1 · 40kg</span><span>Week 16 · 80kg</span></p>
+            <p class="progress-big">+<span data-count="40">40</span>kg</p>
+            <p class="progress-sub">in 16 weeks</p>
           </div>
-          <p class="sticker">Hi, I'm Caitlin 👋</p>
+          <p class="sticker"><span class="live-dot"></span>Taking new clients</p>
 
           <div class="tracker">
             <div class="tracker-head">
@@ -147,7 +178,9 @@ const headline = [
               {
                 workout.map((ex, i) => (
                   <li style={`--i: ${i}`}>
-                    <span class="tick">✓</span>
+                    <span class="tick">
+                      <svg viewBox="0 0 20 20"><path d="m5 10.5 3 3 7-7" /></svg>
+                    </span>
                     <span class="set-name">{ex.name}</span>
                     <span class="set-reps">{ex.sets}</span>
                   </li>
@@ -277,11 +310,32 @@ const headline = [
           }
         </ol>
 
+        <ul class="stats">
+          {
+            stats.map((st, i) => (
+              <li data-reveal style={`--delay: ${i * 120}ms`}>
+                <p class="stat-num">
+                  {st.prefix}
+                  <span data-count={st.value}>{st.value}</span>
+                  {st.suffix}
+                </p>
+                <p class="stat-label">{st.label}</p>
+              </li>
+            ))
+          }
+        </ul>
+
         <ul class="reviews">
           {
             reviews.map((r, i) => (
               <li data-reveal style={`--delay: ${i * 120}ms`}>
-                <p class="stars" aria-label="5 out of 5 stars">★★★★★</p>
+                <p class="stars" role="img" aria-label="5 out of 5 stars">
+                  {[0, 1, 2, 3, 4].map(() => (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" />
+                    </svg>
+                  ))}
+                </p>
                 <blockquote>“{r.quote}”</blockquote>
                 <p class="reviewer">{r.name}</p>
               </li>
@@ -295,8 +349,36 @@ const headline = [
         <div class="book-inner" data-reveal>
           <h2>Ready when <br />you are.</h2>
           <p>Book a free 15-minute chat. No pressure, no hard sell, just a plan.</p>
-          <button type="button" class="btn btn--light" data-book>Book a free chat</button>
-          <p class="book-note" data-book-note hidden>This is an example site, so there's no real booking, but you get confetti.</p>
+          <form class="picker" data-picker>
+            <fieldset class="pick-days">
+              <legend>Pick a day</legend>
+              <div class="chips">
+                {
+                  bookDays.map((day, i) => (
+                    <label class="chip">
+                      <input type="radio" name="day" value={day} checked={i === 1} />
+                      <span>{day}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <fieldset class="pick-times">
+              <legend>Pick a time</legend>
+              <div class="chips chips--times">
+                {
+                  slotTimes.map((t) => (
+                    <label class="chip chip--time">
+                      <input type="radio" name="time" value={t} disabled={!freeSlots.Tue.includes(t)} />
+                      <span>{t}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <button type="submit" class="btn btn--light" data-book>Pick a time first</button>
+          </form>
+          <p class="book-note" data-book-note role="status" aria-live="polite"></p>
         </div>
         <div class="confetti" data-confetti aria-hidden="true"></div>
       </section>
@@ -305,6 +387,11 @@ const headline = [
     <footer class="foot">
       <p class="foot-big">Caitlin<span>.</span></p>
       <p>Personal training in Carryduff, County Down, and online</p>
+      <dl class="foot-info">
+        <div><dt>Where</dt><dd>Carryduff, County Down</dd></div>
+        <div><dt>When</dt><dd>Mon to Fri 7am to 8pm, Sat 9am to 1pm</dd></div>
+        <div><dt>Online</dt><dd>Coaching anywhere, by app</dd></div>
+      </dl>
     </footer>
   </div>
 
@@ -339,9 +426,34 @@ const headline = [
     const colours = ['#ff4f5e', '#b9a6ff', '#e8ff59', '#ffffff', '#111018'];
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    bookBtn?.addEventListener('click', () => {
-      if (bookNote) bookNote.hidden = false;
-      if (!confetti || reduceMotion) return;
+    // ---------- Booking picker ----------
+    const picker = document.querySelector<HTMLFormElement>('[data-picker]');
+    const slots = JSON.parse(document.querySelector('#slot-data')?.textContent ?? '{}') as Record<string, string[]>;
+    const updatePicker = () => {
+      if (!picker || !bookBtn) return;
+      const day = (picker.querySelector<HTMLInputElement>('input[name=day]:checked')?.value) ?? '';
+      const free = slots[day] ?? [];
+      picker.querySelectorAll<HTMLInputElement>('input[name=time]').forEach((input) => {
+        input.disabled = !free.includes(input.value);
+        if (input.disabled) input.checked = false;
+      });
+      const time = picker.querySelector<HTMLInputElement>('input[name=time]:checked')?.value;
+      bookBtn.textContent = time ? `Book ${day} at ${time}` : 'Pick a time first';
+      bookBtn.classList.toggle('is-ready', Boolean(time));
+    };
+    picker?.addEventListener('change', updatePicker);
+    updatePicker();
+
+    picker?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const time = picker.querySelector<HTMLInputElement>('input[name=time]:checked');
+      if (!time) {
+        if (bookNote) bookNote.textContent = 'Pick a time that suits you first.';
+        picker.querySelector<HTMLInputElement>('input[name=time]:not(:disabled)')?.focus();
+        return;
+      }
+      if (bookNote) bookNote.textContent = "This is an example site, so there's no real booking, but you get confetti.";
+      if (!confetti || reduceMotion || !bookBtn) return;
       const btnBox = bookBtn.getBoundingClientRect();
       const box = confetti.getBoundingClientRect();
       const x = btnBox.left + btnBox.width / 2 - box.left;
@@ -360,7 +472,37 @@ const headline = [
         bit.addEventListener('animationend', () => bit.remove());
       }
     });
+
+    // ---------- Numbers that count up when they come into view ----------
+    const counters = document.querySelectorAll<HTMLElement>('[data-count]');
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      const run = (el: HTMLElement) => {
+        const target = Number(el.dataset.count);
+        const start = performance.now();
+        const step = (now: number) => {
+          const t = Math.min((now - start) / 1400, 1);
+          el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            io.unobserve(entry.target);
+            run(entry.target as HTMLElement);
+          }
+        },
+        { threshold: 0.6 },
+      );
+      counters.forEach((el) => {
+        el.textContent = '0';
+        io.observe(el);
+      });
+    }
   </script>
+  <script type="application/json" id="slot-data" set:html={JSON.stringify(freeSlots)} />
   <script type="application/json" id="week-data" set:html={JSON.stringify(Object.fromEntries(Object.entries(weeks).map(([id, w]) => [id, w.days])))} />
 </ExampleLayout>
 
@@ -611,39 +753,92 @@ const headline = [
       transform: rotate(360deg);
     }
   }
+  /* Client progress card (where the photo used to be). */
   .photo {
     position: absolute;
     top: 0;
     right: 0;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
     width: 62%;
     aspect-ratio: 4 / 5;
+    padding: 1.4rem 1.4rem 1.1rem;
     border-radius: 2rem;
     background:
-      repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.04) 0 12px, transparent 12px 24px),
+      repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.05) 0 12px, transparent 12px 24px),
       linear-gradient(160deg, var(--lilac), var(--coral));
+    color: var(--ink);
     overflow: hidden;
     animation: rise 1s var(--ease) 0.3s both;
   }
-  .photo-initial {
+  .progress-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .progress-title {
+    font-weight: 800;
+  }
+  .progress-big {
+    margin-top: auto;
+    text-align: right;
     font-family: var(--display);
-    font-size: clamp(7rem, 4rem + 10vw, 11rem);
+    font-size: clamp(2.6rem, 1.6rem + 3.5vw, 4.2rem);
     font-stretch: 125%;
     font-weight: 900;
-    line-height: 1;
-    color: rgb(17 16 24 / 0.85);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
   }
-  .photo-note {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.25rem 0.75rem;
-    border: 1px dashed rgb(17 16 24 / 0.5);
-    border-radius: 999px;
-    color: var(--ink);
-    font-size: 0.75rem;
+  .progress-sub {
     font-weight: 700;
+    text-align: right;
+  }
+  .chart {
+    width: 100%;
+    height: 34%;
+    margin-top: 1rem;
+    overflow: visible;
+  }
+  .chart-area {
+    fill: rgb(17 16 24 / 0.12);
+    animation: fade 1s var(--ease) 1.6s both;
+  }
+  .chart-line {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    animation: draw 1.8s var(--ease) 0.8s both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 100;
+    }
+  }
+  /* Phones: the card is small and overlapped, so keep just the chart. */
+  @media (max-width: 59.99rem) {
+    .photo {
+      padding-top: 3.25rem;
+    }
+    .photo :is(.progress-label, .chart-axis, .progress-big, .progress-sub) {
+      display: none;
+    }
+    .chart {
+      height: 45%;
+    }
+  }
+  .chart-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    opacity: 0.8;
   }
   .sticker {
     position: absolute;
@@ -655,8 +850,24 @@ const headline = [
     background: var(--volt);
     color: var(--ink);
     font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     transform: rotate(-8deg);
     animation: wobble 3s ease-in-out infinite;
+  }
+  .live-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: #1a9b4b;
+    box-shadow: 0 0 0 0 rgb(26 155 75 / 0.6);
+    animation: live 1.8s ease-out infinite;
+  }
+  @keyframes live {
+    to {
+      box-shadow: 0 0 0 8px rgb(26 155 75 / 0);
+    }
   }
   @keyframes wobble {
     50% {
@@ -771,10 +982,17 @@ const headline = [
     border-radius: 50%;
     background: var(--volt);
     color: var(--ink);
-    font-size: 0.7rem;
-    font-weight: 900;
     animation: tick 0.5s var(--spring) both;
     animation-delay: calc(var(--i) * 350ms + 1.4s);
+  }
+  .tick svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   @keyframes tick {
     from {
@@ -1146,7 +1364,7 @@ const headline = [
   .reviews {
     display: grid;
     gap: 1.25rem;
-    margin-top: 4rem;
+    margin-top: 3rem;
     padding: 0;
     list-style: none;
   }
@@ -1170,8 +1388,43 @@ const headline = [
     transform: translate(-3px, -3px) rotate(-1deg);
   }
   .stars {
-    color: var(--coral);
-    letter-spacing: 0.15em;
+    display: flex;
+    gap: 0.2rem;
+  }
+  .stars svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: var(--coral);
+  }
+
+  /* ---------- Stats ---------- */
+  .stats {
+    display: grid;
+    gap: 1rem;
+    margin-top: 4rem;
+    padding: 0;
+    list-style: none;
+  }
+  .stats li {
+    padding: 1.25rem 0 0;
+    border-top: 2px solid var(--ink);
+  }
+  .stat-num {
+    font-family: var(--display);
+    font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+    font-stretch: 125%;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stats li:nth-child(2) .stat-num {
+    color: var(--coral-deep);
+  }
+  .stat-label {
+    margin-top: 0.4rem;
+    color: var(--grey);
+    font-weight: 600;
   }
   .reviews blockquote {
     margin: 0.75rem 0 1rem;
@@ -1184,6 +1437,7 @@ const headline = [
   }
   @media (min-width: 48rem) {
     .steps,
+    .stats,
     .reviews {
       grid-template-columns: repeat(3, 1fr);
     }
@@ -1208,9 +1462,88 @@ const headline = [
     font-weight: 500;
   }
   .book .book-note {
+    min-height: 1.5em;
     margin: 1.25rem auto 0;
     font-size: 0.95rem;
     font-weight: 700;
+  }
+
+  /* Booking picker: day and time chips (radio buttons). */
+  .picker {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+  .picker fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .picker legend {
+    width: 100%;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .chip span {
+    display: grid;
+    place-items: center;
+    min-width: 3.4rem;
+    min-height: 2.75rem;
+    padding: 0 0.9rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      transform 0.25s var(--spring);
+  }
+  .chip span:hover {
+    transform: translateY(-2px);
+  }
+  .chip input:checked + span {
+    background: var(--ink);
+    color: var(--paper);
+    transform: scale(1.05);
+  }
+  .chip input:focus-visible + span {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .chip input:disabled + span {
+    border-style: dashed;
+    border-color: rgb(17 16 24 / 0.45);
+    color: rgb(17 16 24 / 0.55);
+    text-decoration: line-through;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .chip--time span {
+    font-variant-numeric: tabular-nums;
+  }
+  .picker [data-book] {
+    margin-top: 0.25rem;
+    opacity: 0.7;
+  }
+  .picker [data-book].is-ready {
+    opacity: 1;
   }
   .confetti {
     position: absolute;
@@ -1252,7 +1585,25 @@ const headline = [
   .foot-big span {
     -webkit-text-stroke: 0;
   }
-  .foot p:last-child {
+  .foot > p:last-of-type {
     margin-top: 0.75rem;
+  }
+  .foot-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem 2.5rem;
+    margin: 2rem 0 0;
+  }
+  .foot-info dt {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lilac);
+  }
+  .foot-info dd {
+    margin: 0.2rem 0 0;
+    color: var(--paper);
   }
 </style>
