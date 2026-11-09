@@ -6,6 +6,8 @@
  */
 import LogoMark from './LogoMark.astro';
 import { links, nav, site } from '../data/site';
+
+const path = Astro.url.pathname;
 ---
 
 <header class="site-header theme-dark">
@@ -20,7 +22,7 @@ import { links, nav, site } from '../data/site';
         {
           nav.map((item) => (
             <li>
-              <a href={item.href}>{item.label}</a>
+              <a href={item.href} aria-current={item.href === path ? 'page' : undefined}>{item.label}</a>
             </li>
           ))
         }

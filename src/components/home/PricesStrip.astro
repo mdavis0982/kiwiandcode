@@ -1,0 +1,125 @@
+---
+/**
+ * Short prices teaser at the end of the homepage: the starting price, links to
+ * the full price list and the gyms page, then the contact panel.
+ * The full list lives on /pricing/ (src/pages/pricing/index.astro).
+ */
+import ContactPanel from '../shared/ContactPanel.astro';
+import { links } from '../../data/site';
+import { packages, carePlans, gymPlan, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+
+const lowest = Math.min(...packages.map((p) => p.price));
+const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
+---
+
+<section id="pricing" class="section theme-dark strip" aria-labelledby="strip-title">
+  <div class="container">
+    <div class="strip-grid">
+      <div class="strip-head" data-reveal>
+        <p class="eyebrow">Prices</p>
+        <h2 id="strip-title">
+          Websites from <span class="price">{formatPrice(lowest)}</span>
+        </h2>
+        {
+          showOffer ? (
+            <p>
+              Or from <strong>{formatPrice(offerPrice(lowest))}</strong> for my first {offer.spotsTotal} clients, with{' '}
+              {offer.percent}% off any package. Care plans from {formatPrice(lowestCare)} a month.
+            </p>
+          ) : (
+            <p>Care plans from {formatPrice(lowestCare)} a month. Every quote is free and fixed before we start.</p>
+          )
+        }
+      </div>
+
+      <ul class="strip-links">
+        <li data-reveal style="--delay: 80ms">
+          <a href={links.pricing}>
+            <span class="k">All prices</span>
+            <span class="t">Packages, care plans and common questions</span>
+            <span class="a" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+        <li data-reveal style="--delay: 160ms">
+          <a href={links.gyms}>
+            <span class="k">Gyms &amp; PTs</span>
+            <span class="t">Pay monthly: {formatPrice(gymPlan.monthly)} a month, {formatPrice(gymPlan.setup)} to set up</span>
+            <span class="a" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <ContactPanel />
+  </div>
+</section>
+
+<style>
+  .strip-grid {
+    display: grid;
+    gap: var(--space-m);
+    margin-bottom: var(--space-m);
+  }
+  .strip-head p:not(.eyebrow) {
+    margin-top: var(--space-xs);
+    color: var(--mist);
+  }
+  .strip-head strong {
+    color: var(--peach);
+  }
+  .price {
+    color: var(--kiwi);
+  }
+  .strip-links {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+  .strip-links a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.1rem 1rem;
+    min-height: 3.5rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--ink-line);
+    border-radius: var(--radius);
+    background: var(--ink-raised);
+    color: var(--chalk);
+    text-decoration: none;
+    transition: border-color 0.25s;
+  }
+  .strip-links a:hover {
+    border-color: var(--kiwi);
+  }
+  .k {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+  .t {
+    grid-column: 1;
+    color: var(--mist);
+    font-size: var(--step--1);
+  }
+  .a {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: var(--step-1);
+    color: var(--kiwi);
+    transition: transform 0.3s var(--ease-spring);
+  }
+  .strip-links a:hover .a {
+    transform: translateX(4px);
+  }
+
+  @media (min-width: 56rem) {
+    .strip-grid {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+      gap: var(--space-l);
+      margin-bottom: var(--space-l);
+    }
+  }
+</style>

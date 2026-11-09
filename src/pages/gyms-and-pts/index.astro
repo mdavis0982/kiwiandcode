@@ -1,0 +1,992 @@
+---
+/**
+ * Gyms and personal trainers: a landing page for Marcus's fitness niche,
+ * with a monthly plan. Linked in the menu and in outreach messages.
+ *
+ * Animations (all calm on phones, off with reduced motion):
+ * - Headline lines wipe in on load (.wipe in global.css).
+ * - Desktop: the example timetable's classes pop in and fill up, then a
+ *   "new booking" note slides in.
+ * - Pay monthly / pay once switch: the price digits roll like an odometer.
+ *   The switch is two radio buttons and works with CSS alone (:has), so it
+ *   needs no JavaScript.
+ *
+ * Plan prices come from `gymPlan` in src/data/pricing.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/shared/Faq.astro';
+import ContactPanel from '../../components/shared/ContactPanel.astro';
+import { links } from '../../data/site';
+import { gymPlan, carePlans, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+
+const ptExample = '/examples/personal-trainer/';
+
+// ---- Example timetable (made up, for illustration) ----
+const days = [
+  { day: 'Mon', slots: [{ t: '06:30', c: 'HIIT', f: 80 }, { t: '18:00', c: 'Bootcamp', f: 100 }] },
+  { day: 'Tue', slots: [{ t: '07:00', c: 'Spin', f: 60 }, { t: '18:30', c: 'Strength', f: 40, booked: true }] },
+  { day: 'Wed', slots: [{ t: '06:30', c: 'HIIT', f: 90 }, { t: '19:00', c: 'Yoga', f: 50 }] },
+  { day: 'Thu', slots: [{ t: '07:00', c: 'Spin', f: 70 }, { t: '18:00', c: 'Bootcamp', f: 85 }] },
+  { day: 'Fri', slots: [{ t: '06:30', c: 'HIIT', f: 55 }, { t: '17:30', c: 'Circuits', f: 30 }] },
+];
+
+// ---- Odometer digits for the price switch ----
+// Both prices are padded to the same number of digits; a blank (10) collapses.
+const toDigits = (n: number, len: number) =>
+  String(n)
+    .padStart(len, ' ')
+    .split('')
+    .map((d) => (d === ' ' ? 10 : Number(d)));
+const len = Math.max(String(gymPlan.monthly).length, String(gymPlan.oneOff).length);
+const monthlyDigits = toDigits(gymPlan.monthly, len);
+const onceDigits = toDigits(gymPlan.oneOff, len);
+const reel = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+const lowestCare = Math.min(...carePlans.map((p) => p.monthly));
+
+const problems = [
+  {
+    title: 'Everything lives on Instagram',
+    text: 'New people have to scroll back through your posts to find your prices, class times and how to join.',
+  },
+  {
+    title: 'Booking is a tangle of links',
+    text: 'A link in bio, a form, a WhatsApp number. Every extra step is a chance for someone to give up.',
+  },
+  {
+    title: "Google doesn't know you exist",
+    text: 'Someone searches for a personal trainer nearby and finds the gym down the road instead.',
+  },
+];
+
+const features = [
+  {
+    title: 'Your timetable',
+    text: 'Classes and sessions laid out clearly, easy to read on a phone.',
+    icon: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  },
+  {
+    title: 'A proper booking button',
+    text: "Linked to the booking app you already use, or a simple form if you don't have one.",
+    icon: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/>',
+  },
+  {
+    title: 'Prices and memberships',
+    text: 'PT sessions, blocks, memberships and offers, all in one place.',
+    icon: '<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1"/>',
+  },
+  {
+    title: 'Real results and reviews',
+    text: 'Show off transformations and what your clients say, with their permission.',
+    icon: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+  },
+  {
+    title: 'Found on Google',
+    text: 'Set up so people searching for a gym or PT in your town can find you.',
+    icon: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  },
+  {
+    title: 'Changes when you need them',
+    text: 'New class, new price, new photo? Send me a message and I sort it.',
+    icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  },
+];
+
+const faqs = [
+  {
+    q: 'What happens after the first 12 months?',
+    a: "You can keep going month to month, and cancel any time after that with a month's notice.",
+  },
+  {
+    q: 'I already use a booking app. Can I keep it?',
+    a: "Yes. Your site links straight to the app you already use, so nothing changes for your members. If you don't have one, I can set up a simple booking or enquiry form.",
+  },
+  {
+    q: "What if I don't have good photos?",
+    a: "Phone photos are fine to start with, and I'll help you pick the best ones. You can swap in better ones later at no extra cost.",
+  },
+  {
+    q: 'Is pay monthly or pay once better?',
+    a: `Pay monthly costs less up front and includes hosting and changes. Paying once costs more at the start but is cheaper over time, with an optional care plan from ${formatPrice(lowestCare)} a month.`,
+  },
+  {
+    q: 'Do I get a demo first?',
+    a: "Yes. I'll build a free demo of your homepage so you can see it before you decide, with no obligation.",
+  },
+];
+---
+
+<BaseLayout
+  title="Websites for gyms and personal trainers in County Down | Kiwi and Code"
+  description={`Websites for gyms, personal trainers and fitness studios in County Down. Timetable, prices and booking in one place, from ${formatPrice(gymPlan.monthly)} a month.`}
+>
+  <!-- ============ Hero ============ -->
+  <section class="g-hero theme-dark" aria-labelledby="g-title">
+    <div class="g-hero-bg" aria-hidden="true"></div>
+    <div class="container g-hero-inner">
+      <div class="g-hero-copy">
+        <p class="eyebrow">For gyms and personal trainers</p>
+        <h1 id="g-title" class="wipe">
+          <span style="--i: 0">Fill your classes,</span>
+          <span style="--i: 1" class="hl">not your DMs.</span>
+        </h1>
+        <p class="lead">
+          Websites for gyms, PTs and fitness studios in County Down. Your timetable, prices and a booking button in one
+          place, so new people can find you on Google and sign up without messaging you first.
+        </p>
+        <div class="actions">
+          <a class="btn" href={links.contact}>
+            Get a free demo
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
+              ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              ></path></svg
+            >
+          </a>
+          <a class="btn btn--ghost" href={ptExample}>See an example PT site</a>
+        </div>
+        <ul class="perks">
+          <li>Free demo, no obligation</li>
+          <li>From {formatPrice(gymPlan.monthly)} a month</li>
+          <li>Your domain, in your name</li>
+        </ul>
+      </div>
+
+      <!-- Example timetable: decorative, so hidden from screen readers. -->
+      <figure class="tt" data-reveal aria-hidden="true">
+        <div class="tt-head">
+          <p class="tt-title">Class timetable</p>
+          <span class="tt-tag">Example</span>
+        </div>
+        <div class="tt-grid">
+          {
+            days.map((d, di) => (
+              <div class="tt-day">
+                <p class="tt-dayname">{d.day}</p>
+                {d.slots.map((s, si) => (
+                  <div
+                    class:list={['tt-slot', { 'is-full': s.f >= 100, 'is-booked': s.booked }]}
+                    style={`--n: ${di * 2 + si}; --fill: ${s.f}%`}
+                  >
+                    <span class="tt-time">{s.t}</span>
+                    <span class="tt-class">{s.c}</span>
+                    <span class="tt-bar">
+                      <span />
+                    </span>
+                    <span class="tt-left">{s.f >= 100 ? 'Full' : `${Math.round((100 - s.f) / 10)} ${Math.round((100 - s.f) / 10) === 1 ? 'space' : 'spaces'}`}</span>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+        <div class="tt-toast">
+          <svg viewBox="0 0 20 20"><path d="m5 10.5 3 3 7-7"></path></svg>
+          <span><strong>New booking</strong> Strength, Tue 18:30</span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ Problems ============ -->
+  <section class="section theme-light" aria-labelledby="g-problems">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Sound familiar?</p>
+        <h2 id="g-problems">Great training, hard to find</h2>
+      </div>
+      <ol class="problems">
+        {
+          problems.map((p, i) => (
+            <li data-reveal style={`--delay: ${i * 90}ms`}>
+              <span class="num" aria-hidden="true">0{i + 1}</span>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ What you get ============ -->
+  <section class="section theme-dark" aria-labelledby="g-get">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">What you get</p>
+        <h2 id="g-get">Everything a new member looks for</h2>
+        <p>Built around how people actually choose a gym or a trainer: on their phone, in a couple of minutes.</p>
+      </div>
+      <ul class="features">
+        {
+          features.map((f, i) => (
+            <li data-reveal style={`--delay: ${(i % 3) * 80}ms`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true" set:html={f.icon} />
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Example ============ -->
+  <section class="section theme-light" aria-labelledby="g-example">
+    <div class="container example">
+      <div data-reveal>
+        <p class="eyebrow">See it working</p>
+        <h2 id="g-example">An example personal trainer site</h2>
+        <p class="ex-text">
+          Caitlin is a made-up personal trainer I designed to show what a fitness site can look like: sessions, prices,
+          how it works and an easy way to book a first chat.
+        </p>
+        <a class="btn" href={ptExample}>
+          Have a look
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
+            ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            ></path></svg
+          >
+        </a>
+      </div>
+      <a class="ex-frame" href={ptExample} data-reveal style="--delay: 120ms">
+        <span class="visually-hidden">Open the example personal trainer site:</span>
+        <span class="ex-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="ex-screen" aria-hidden="true">
+          <span class="ex-brand">Caitlin<b>.</b></span>
+          <span class="ex-line">Stronger,</span>
+          <span class="ex-line ex-line--volt">every week.</span>
+          <span class="ex-btn">Book a free chat</span>
+        </span>
+        <span class="ex-label">Example design</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ Plan ============ -->
+  <section class="section theme-dark" aria-labelledby="g-plan">
+    <div class="container plan-wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Prices</p>
+        <h2 id="g-plan">Pay monthly, or pay once</h2>
+        <p>Pick whichever suits your cash flow. Same site either way.</p>
+      </div>
+
+      <div class="plan" data-reveal>
+        <fieldset class="switch">
+          <legend class="visually-hidden">How would you like to pay?</legend>
+          <input type="radio" name="billing" id="bill-monthly" value="monthly" checked />
+          <label for="bill-monthly">Pay monthly</label>
+          <input type="radio" name="billing" id="bill-once" value="once" />
+          <label for="bill-once">Pay once</label>
+          <span class="switch-pill" aria-hidden="true"></span>
+        </fieldset>
+
+        <div class="price-row">
+          <p class="big" aria-hidden="true">
+            <span class="once-only from">from</span>
+            <span class="cur">£</span>
+            {
+              monthlyDigits.map((m, c) => (
+                <span
+                  class="digit"
+                  style={`--m: ${m}; --o: ${onceDigits[c]}; --c: ${c}; --mw: ${m === 10 ? 0 : 1}; --ow: ${onceDigits[c] === 10 ? 0 : 1}`}
+                >
+                  <span class="reel">
+                    {reel.map((d) => (
+                      <span>{d}</span>
+                    ))}
+                    <span />
+                  </span>
+                </span>
+              ))
+            }
+            <span class="per monthly-only">/month</span>
+            <span class="per once-only">one-off</span>
+          </p>
+          <p class="visually-hidden monthly-only">{formatPrice(gymPlan.monthly)} a month</p>
+          <p class="visually-hidden once-only">From {formatPrice(gymPlan.oneOff)}, paid once</p>
+          <p class="price-note monthly-only">
+            Plus {formatPrice(gymPlan.setup)} to set up. {gymPlan.minMonths}-month minimum, then month to month.
+          </p>
+          <p class="price-note once-only">
+            Half up front, half when it's finished.
+            {
+              showOffer && (
+                <span class="offer-note">
+                  Founding offer: from {formatPrice(offerPrice(gymPlan.oneOff))} for my first {offer.spotsTotal} clients.
+                </span>
+              )
+            }
+          </p>
+        </div>
+
+        <ul class="incl monthly-only">
+          {
+            gymPlan.monthlyIncludes.map((item) => (
+              <li>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10.5 3 3 7-7" /></svg>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="incl once-only">
+          {
+            gymPlan.oneOffIncludes.map((item) => (
+              <li>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10.5 3 3 7-7" /></svg>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+
+        <a class="btn plan-cta" href={links.contact}>Get a free demo first</a>
+      </div>
+      <p class="all-prices" data-reveal>
+        Need something bigger, like an online shop? <a class="link" href={links.pricing}>See all prices</a>.
+      </p>
+    </div>
+  </section>
+
+  <Faq items={faqs} title="Questions gyms and PTs ask" />
+
+  <section class="section theme-dark closing">
+    <div class="container">
+      <ContactPanel
+        title="Want to see what yours would look like?"
+        text="I'll build a free demo homepage for your gym or PT business, with no obligation."
+        button="Get a free demo"
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ================= Hero ================= */
+  .g-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-l) var(--space-xl);
+  }
+  .g-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 85% 20%, rgb(155 225 93 / 0.16), transparent 70%),
+      radial-gradient(ellipse 40% 50% at 10% 90%, rgb(255 122 89 / 0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .g-hero-inner {
+    position: relative;
+    display: grid;
+    gap: var(--space-l);
+  }
+  .g-hero h1 {
+    font-size: var(--step-4);
+    line-height: 1.02;
+  }
+  .hl {
+    color: var(--kiwi);
+  }
+  .lead {
+    margin-top: var(--space-m);
+    max-width: 36rem;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--mist);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-m);
+  }
+  .perks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    margin-top: var(--space-m);
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--mist);
+  }
+  .perks li::before {
+    content: '+ ';
+    color: var(--kiwi);
+  }
+
+  /* ---- Example timetable ---- */
+  .tt {
+    position: relative;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--ink-line);
+    border-radius: 1.25rem;
+    background: var(--ink-raised);
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+  }
+  .tt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .tt-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+  .tt-tag {
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--ink-line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--mist);
+  }
+  .tt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  /* Phones show three days to keep it readable. */
+  .tt-day:nth-child(n + 4) {
+    display: none;
+  }
+  .tt-dayname {
+    margin-bottom: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--mist);
+  }
+  .tt-slot {
+    display: grid;
+    gap: 0.15rem;
+    margin-bottom: 0.5rem;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid var(--ink-line);
+    border-radius: 0.6rem;
+    background: rgb(13 27 20 / 0.6);
+    font-size: 0.8rem;
+  }
+  .tt-time {
+    font-family: var(--font-mono);
+    color: var(--mist);
+    font-size: 0.72rem;
+  }
+  .tt-class {
+    font-weight: 600;
+  }
+  .tt-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: var(--ink-line);
+    overflow: hidden;
+  }
+  .tt-bar span {
+    display: block;
+    height: 100%;
+    width: var(--fill);
+    border-radius: inherit;
+    background: var(--kiwi);
+  }
+  .is-full .tt-bar span {
+    background: var(--coral);
+  }
+  .tt-left {
+    font-size: 0.7rem;
+    color: var(--mist);
+  }
+  .is-booked {
+    border-color: var(--kiwi);
+  }
+  .tt-toast {
+    display: none;
+  }
+
+  /* ================= Problems ================= */
+  .problems {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+  .problems li {
+    padding: var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .problems h3 {
+    margin-top: 0.4rem;
+    font-size: var(--step-1);
+  }
+  .problems p {
+    margin-top: 0.4rem;
+    color: var(--muted);
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--leaf);
+  }
+
+  /* ================= Features ================= */
+  .features {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+  .features li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.2rem 0.9rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--ink-line);
+    border-radius: var(--radius);
+    background: var(--ink-raised);
+    transition: border-color 0.25s;
+  }
+  .features li:hover {
+    border-color: var(--kiwi);
+  }
+  .features svg {
+    grid-row: span 2;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0.55rem;
+    border-radius: 0.75rem;
+    background: rgb(155 225 93 / 0.12);
+    fill: none;
+    stroke: var(--kiwi);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .features h3 {
+    font-size: var(--step-0);
+  }
+  .features p {
+    color: var(--mist);
+    font-size: var(--step--1);
+  }
+
+  /* ================= Example ================= */
+  .example {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+  }
+  .ex-text {
+    margin-block: var(--space-s) var(--space-m);
+    color: var(--muted);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    max-width: 34rem;
+  }
+  .ex-frame {
+    position: relative;
+    display: block;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--paper-line);
+    background: #111018;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .ex-frame:hover {
+    transform: translateY(-4px) rotate(-0.5deg);
+  }
+  .ex-bar {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.6rem 0.8rem;
+    background: #1c1a26;
+  }
+  .ex-bar i {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: #2e2b3b;
+  }
+  .ex-screen {
+    display: grid;
+    justify-items: start;
+    gap: 0.2rem;
+    padding: 1.4rem 1.4rem 2.6rem;
+    background: radial-gradient(ellipse 70% 80% at 100% 0%, rgb(185 166 255 / 0.25), transparent 70%), #111018;
+    color: #f6f3ee;
+  }
+  .ex-brand {
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+  }
+  .ex-brand b {
+    color: #ff4f5e;
+  }
+  .ex-line {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: var(--step-3);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .ex-line--volt {
+    color: #e8ff59;
+  }
+  .ex-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: #ff4f5e;
+    color: #111018;
+    font-weight: 700;
+    font-size: var(--step--1);
+  }
+  .ex-label {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #b6b3c0;
+  }
+
+  /* ================= Plan switch ================= */
+  .plan-wrap .section-head {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .plan {
+    max-width: 34rem;
+    margin-inline: auto;
+    padding: var(--space-m) 1.25rem;
+    border: 1px solid var(--kiwi);
+    border-radius: 1.5rem;
+    background: radial-gradient(ellipse 90% 60% at 50% 0%, rgb(155 225 93 / 0.14), transparent 70%), var(--ink-raised);
+    box-shadow: 0 30px 80px -40px rgb(155 225 93 / 0.4);
+  }
+
+  .switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto var(--space-m);
+    padding: 0.3rem;
+    border: 1px solid var(--ink-line);
+    border-radius: 999px;
+    background: var(--ink);
+    max-width: 20rem;
+  }
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .switch label {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--mist);
+    transition: color 0.3s;
+  }
+  .switch input:checked + label {
+    color: var(--ink);
+  }
+  .switch input:focus-visible + label {
+    outline: 3px solid var(--kiwi);
+    outline-offset: 3px;
+  }
+  .switch-pill {
+    position: absolute;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    left: 0.3rem;
+    width: calc(50% - 0.3rem);
+    border-radius: 999px;
+    background: var(--kiwi);
+    transition: transform 0.45s var(--ease-spring);
+  }
+  .plan:has(#bill-once:checked) .switch-pill {
+    transform: translateX(100%);
+  }
+
+  /* Show the right words for the chosen option. */
+  .plan:has(#bill-monthly:checked) .once-only,
+  .plan:has(#bill-once:checked) .monthly-only {
+    display: none;
+  }
+
+  .price-row {
+    text-align: center;
+  }
+  .big {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.05em;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(3.2rem, 2.4rem + 4vw, 4.75rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .cur {
+    font-size: 0.6em;
+    color: var(--kiwi);
+    align-self: flex-start;
+    margin-top: 0.15em;
+  }
+  .from,
+  .per {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 400;
+    color: var(--mist);
+  }
+  .from {
+    align-self: center;
+    margin-right: 0.4rem;
+  }
+  .per {
+    margin-left: 0.3rem;
+  }
+
+  /* Odometer: each digit is a reel of 0-9 plus a blank, shifted up to the
+     right number. Widths collapse for blank digits. */
+  .digit {
+    display: inline-block;
+    height: 1em;
+    width: calc(var(--mw) * 0.58em);
+    overflow: hidden;
+    transition: width 0.5s var(--ease-out);
+  }
+  .reel {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(calc(var(--m) * -1em));
+    transition: transform 0.7s var(--ease-spring);
+    transition-delay: calc(var(--c) * 70ms);
+  }
+  .reel > span {
+    display: block;
+    height: 1em;
+    width: 0.58em;
+    text-align: center;
+  }
+  .plan:has(#bill-once:checked) .digit {
+    width: calc(var(--ow) * 0.58em);
+  }
+  .plan:has(#bill-once:checked) .reel {
+    transform: translateY(calc(var(--o) * -1em));
+  }
+
+  .price-note {
+    margin-top: 0.6rem;
+    color: var(--mist);
+    font-size: var(--step--1);
+  }
+  .offer-note {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--peach);
+  }
+
+  .incl {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: var(--space-m);
+    padding: var(--space-m) 0 0;
+    border-top: 1px solid var(--ink-line);
+    list-style: none;
+  }
+  .incl li {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+  }
+  .incl svg {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.2rem;
+    fill: none;
+    stroke: var(--kiwi);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .plan-cta {
+    width: 100%;
+    margin-top: var(--space-m);
+  }
+  .all-prices {
+    margin-top: var(--space-m);
+    text-align: center;
+    color: var(--mist);
+  }
+
+  .closing {
+    padding-top: 0;
+  }
+
+  /* ================= Wider screens ================= */
+  @media (min-width: 40rem) {
+    .problems {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .features {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 56rem) {
+    .g-hero {
+      padding-block: var(--space-xl);
+    }
+    .g-hero-inner {
+      grid-template-columns: 1.05fr 1fr;
+      align-items: center;
+      gap: var(--space-xl);
+    }
+    .tt {
+      padding: 1.25rem;
+      rotate: 1.5deg;
+    }
+    .tt-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    .tt-day:nth-child(n + 4) {
+      display: block;
+    }
+    .tt-toast {
+      position: absolute;
+      left: -2rem;
+      bottom: -2.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.7rem 1rem;
+      border-radius: 0.9rem;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: var(--step--1);
+      box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.7);
+      transform: rotate(-1.5deg);
+    }
+    .tt-toast svg {
+      width: 1.6rem;
+      height: 1.6rem;
+      padding: 0.3rem;
+      border-radius: 50%;
+      background: var(--kiwi);
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .tt-toast strong {
+      display: block;
+    }
+    .features {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .features li {
+      grid-template-columns: 1fr;
+      padding: var(--space-m);
+    }
+    .features svg {
+      grid-row: auto;
+      margin-bottom: 0.5rem;
+    }
+    .example {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+    .plan {
+      padding: var(--space-l);
+    }
+  }
+
+  /* Desktop motion: timetable classes pop in, fill up, then a booking lands. */
+  @media (min-width: 56rem) and (prefers-reduced-motion: no-preference) {
+    :global(.js) .tt .tt-slot {
+      opacity: 0;
+      transform: translateY(8px) scale(0.96);
+    }
+    :global(.js) .tt .tt-bar span {
+      width: 0;
+    }
+    :global(.js) .tt .tt-toast {
+      opacity: 0;
+      transform: translateY(16px) rotate(-1.5deg);
+    }
+    :global(.js) .tt.is-visible .tt-slot {
+      animation: slot-in 0.5s var(--ease-out) forwards;
+      animation-delay: calc(300ms + var(--n) * 70ms);
+    }
+    :global(.js) .tt.is-visible .tt-bar span {
+      animation: bar-fill 0.9s var(--ease-out) forwards;
+      animation-delay: calc(600ms + var(--n) * 70ms);
+    }
+    :global(.js) .tt.is-visible .is-booked {
+      animation:
+        slot-in 0.5s var(--ease-out) forwards,
+        booked 1.2s var(--ease-out) 2.2s;
+      animation-delay: calc(300ms + var(--n) * 70ms), 2.2s;
+    }
+    :global(.js) .tt.is-visible .tt-toast {
+      animation: toast-in 0.6s var(--ease-spring) 2.2s forwards;
+    }
+    .ex-frame:hover .ex-line--volt {
+      text-shadow: 0 0 24px rgb(232 255 89 / 0.5);
+    }
+  }
+  @keyframes slot-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes bar-fill {
+    from {
+      width: 0;
+    }
+    to {
+      width: var(--fill);
+    }
+  }
+  @keyframes booked {
+    0% {
+      box-shadow: 0 0 0 0 rgb(155 225 93 / 0.6);
+    }
+    100% {
+      box-shadow: 0 0 0 10px rgb(155 225 93 / 0);
+    }
+  }
+  @keyframes toast-in {
+    to {
+      opacity: 1;
+      transform: rotate(-1.5deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reel,
+    .digit,
+    .switch-pill {
+      transition: none;
+    }
+  }
+</style>

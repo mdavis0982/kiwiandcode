@@ -25,14 +25,14 @@ export const site = {
  */
 export const links = {
   examples: '/#examples',
-  pricing: '/#pricing',
+  pricing: '/pricing/',
+  gyms: '/gyms-and-pts/',
   contact: '/contact/',
 };
 
 export const nav = [
-  { label: 'Services', href: '/#services' },
-  { label: 'How it works', href: '/#process' },
-  { label: 'About', href: '/#about' },
   { label: 'Examples', href: links.examples },
   { label: 'Prices', href: links.pricing },
+  { label: 'Gyms & PTs', href: links.gyms },
+  { label: 'About', href: '/#about' },
 ];
