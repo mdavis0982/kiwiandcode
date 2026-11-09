@@ -12,9 +12,15 @@ export const site = {
   instagram: 'https://www.instagram.com/kiwiandcode/' as string | null,
 
   // Default SEO text, used by any page that doesn't set its own.
-  title: 'Kiwi and Code | Affordable websites for small businesses in County Down, Ireland',
+  // Title and description only appear in Google results and link previews, never
+  // on the page, so they say "Northern Ireland" (what people search for). Visible
+  // page text says "County Down" and "Ireland" instead.
+  title: 'Web Design County Down, Northern Ireland | Kiwi and Code',
   description:
-    'Clean, fast, affordable websites for small and local businesses in County Down, Ireland. Built by Marcus Davis, a local developer you can talk to.',
+    'Affordable web design for small and local businesses in County Down, Northern Ireland. Fast, clean websites built by Marcus Davis, a local developer you can talk to.',
+
+  // Towns listed in the structured data as places served (not shown on the page).
+  townsServed: ['Downpatrick', 'Ballynahinch', 'Saintfield', 'Newcastle', 'Castlewellan', 'Comber', 'Newtownards', 'Banbridge', 'Dromore', 'Carryduff'],
   ogImage: '/og-image.png',
 };
 

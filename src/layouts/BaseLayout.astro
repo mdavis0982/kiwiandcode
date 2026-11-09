@@ -48,11 +48,12 @@ const jsonLd = {
   founder: { '@type': 'Person', name: site.owner },
   areaServed: [
     { '@type': 'AdministrativeArea', name: 'County Down' },
-    { '@type': 'Place', name: 'Ireland' },
+    { '@type': 'AdministrativeArea', name: 'Northern Ireland' },
+    ...site.townsServed.map((town) => ({ '@type': 'City', name: town })),
   ],
   address: {
     '@type': 'PostalAddress',
-    addressRegion: 'County Down',
+    addressRegion: 'County Down, Northern Ireland',
     addressCountry: 'GB',
   },
   ...(site.instagram ? { sameAs: [site.instagram] } : {}),
