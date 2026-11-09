@@ -1,0 +1,76 @@
+---
+/**
+ * Prices page: the full price list, the pay monthly / pay once switch (open
+ * to every business), common questions and a closing call to action.
+ * Prices come from src/data/pricing.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Pricing from '../../components/home/Pricing.astro';
+import Faq from '../../components/shared/Faq.astro';
+import ContactPanel from '../../components/shared/ContactPanel.astro';
+import PlanSwitch from '../../components/shared/PlanSwitch.astro';
+import { links } from '../../data/site';
+import { offer, showOffer, monthlyPlan, formatPrice } from '../../data/pricing';
+
+const faqs = [
+  {
+    q: 'What does "from" mean?',
+    a: "These are starting prices. After a free chat and a free mock-up of your homepage, I give you a fixed quote for what you actually need, so there are no surprises later.",
+  },
+  {
+    q: 'How do I pay?',
+    a: "Half up front once we've agreed the plan, and the other half when your site is finished and you're happy with it.",
+  },
+  {
+    q: 'Who owns the website?',
+    a: "You do. Your domain and hosting are set up in your own name and billed to your own accounts, so you're never locked in to me.",
+  },
+  {
+    q: 'Are there any other costs?',
+    a: "Your domain name, usually around £10 to £20 a year, paid straight to the provider. Hosting for most small sites is free or very cheap, and I'll tell you exactly what to expect before you commit.",
+  },
+  {
+    q: 'How does paying monthly work?',
+    a: `You pay ${formatPrice(monthlyPlan.setup)} to set up, then ${formatPrice(monthlyPlan.monthly)} a month for at least ${monthlyPlan.minMonths} months. That covers the build, hosting, backups and small changes. After that it carries on month to month, and you can cancel with a month's notice.`,
+  },
+  {
+    q: 'Do I need a care plan?',
+    a: "No, they're optional. Without one, I'm still happy to help with changes when you need them, at £30 an hour.",
+  },
+  ...(showOffer
+    ? [
+        {
+          q: 'What is the founding offer?',
+          a: `My first ${offer.spotsTotal} clients get ${offer.percent}% off any package. In return, I ask for an honest review and permission to show your site as an example of my work.`,
+        },
+      ]
+    : []),
+  {
+    q: 'How long does it take?',
+    a: 'A free demo of your homepage comes first, on a quick turnaround. Most sites then go live within a few weeks, depending on how quickly the words and photos come together.',
+  },
+];
+---
+
+<BaseLayout
+  title="Prices | Kiwi and Code"
+  description="Website prices for small businesses in County Down: one-page sites from £395, up to 5 pages from £695, shops and booking from £1,195. Or pay monthly from £55 a month."
+>
+  <Pricing level={1} />
+
+  <PlanSwitch />
+
+  <Faq items={faqs} title="Questions about prices" />
+
+  <section class="section theme-dark closing">
+    <div class="container">
+      <ContactPanel title="Want a price for your business?" text="Tell me what you need and I'll come back with a free, fixed quote." />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .closing {
+    padding-top: var(--space-l);
+  }
+</style>

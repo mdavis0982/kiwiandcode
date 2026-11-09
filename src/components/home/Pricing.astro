@@ -1,12 +1,19 @@
 ---
 /**
- * Prices and contact, together at the end of the homepage: the founding
- * offer banner, the three packages, the care plans and a short contact strip.
- * Prices come from src/data/pricing.ts.
+ * The full price list: founding offer banner, the three packages and the
+ * care plans. Used on the /pricing/ page. Prices come from src/data/pricing.ts.
+ *
+ * On desktop, a soft kiwi glow follows the cursor around each card's border.
  */
-import LogoMark from '../LogoMark.astro';
-import { links, site } from '../../data/site';
 import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '../../data/pricing';
+
+interface Props {
+  /** 1 when this is the main heading of the page. */
+  level?: 1 | 2;
+}
+const { level = 2 } = Astro.props;
+const Heading = level === 1 ? 'h1' : 'h2';
+const Sub = level === 1 ? 'h2' : 'h3';
 ---
 
 <section id="pricing" class="section theme-dark pricing" aria-labelledby="pricing-title">
@@ -14,7 +21,10 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
     <div class="head" data-reveal>
       <div class="section-head">
         <p class="eyebrow">Prices</p>
-        <h2 id="pricing-title">Simple prices, no surprises</h2>
+        <Heading id="pricing-title" class="wipe">
+          <span style="--i: 0">Simple prices,</span>
+          <span style="--i: 1">no surprises</span>
+        </Heading>
         <p>
           These are starting prices, not fixed ones. Every business is different, so I quote each project on what you
           actually need, after a free chat and a free mock-up of your homepage.
@@ -45,9 +55,9 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
     <ul class="plans">
       {
         packages.map((pkg, i) => (
-          <li class:list={['plan', { 'is-popular': pkg.popular }]} data-reveal style={`--delay: ${i * 90}ms`}>
+          <li class:list={['plan', { 'is-popular': pkg.popular }]} data-reveal data-glow style={`--delay: ${i * 90}ms`}>
             <div class="plan-top">
-              <h3>{pkg.name}</h3>
+              <Sub class="plan-name">{pkg.name}</Sub>
               {pkg.popular && <span class="popular">Most popular</span>}
             </div>
             <p class="price">
@@ -85,7 +95,7 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
 
     <div class="care" data-reveal>
       <div class="care-intro">
-        <h3>Care plans</h3>
+        <Sub class="care-title">Care plans</Sub>
         <p>Optional upkeep so your site stays secure and current. Cancel any time with a month's notice.</p>
       </div>
       <ul class="care-list">
@@ -102,53 +112,21 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
       </ul>
     </div>
 
-    <div id="contact" class="panel" data-reveal>
-      <div class="panel-art" aria-hidden="true">
-        <LogoMark class="panel-mark" />
-      </div>
-      <div class="panel-copy">
-        <h3>Got a project in mind, or just a question?</h3>
-        <p>Quotes are free and there's no obligation.</p>
-      </div>
-      <div class="actions">
-        <a class="btn btn--big" href={links.contact}>
-          Get a free quote
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"
-            ><path d="M4 10h11m-4-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            ></path></svg
-          >
-        </a>
-        <button class="copy" type="button" data-copy={site.email}>
-          <span class="copy-email">{site.email}</span>
-          <span class="copy-hint">Copy</span>
-        </button>
-        <p class="copy-status" role="status" aria-live="polite"></p>
-      </div>
-    </div>
   </div>
 </section>
 
 <script>
-  // "Copy" button: puts the email address on the clipboard and confirms it.
-  const button = document.querySelector<HTMLButtonElement>('.pricing [data-copy]');
-  const status = document.querySelector('.pricing .copy-status');
-  const hint = button?.querySelector('.copy-hint');
-
-  button?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(button.dataset.copy ?? '');
-      if (hint) hint.textContent = 'Copied!';
-      if (status) status.textContent = 'Email address copied to clipboard.';
-      button.classList.add('is-copied');
-      setTimeout(() => {
-        if (hint) hint.textContent = 'Copy';
-        button.classList.remove('is-copied');
-      }, 2000);
-    } catch {
-      // Clipboard blocked: the address is still visible to copy by hand.
-      if (status) status.textContent = 'Copying failed. The address is shown on the button.';
-    }
-  });
+  // Desktop only: a soft glow follows the cursor around each price card.
+  // Sets --mx/--my on the card; the CSS draws the glow with a radial gradient.
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-glow]').forEach((card) => {
+      card.addEventListener('pointermove', (event) => {
+        const box = card.getBoundingClientRect();
+        card.style.setProperty('--mx', `${event.clientX - box.left}px`);
+        card.style.setProperty('--my', `${event.clientY - box.top}px`);
+      });
+    });
+  }
 </script>
 
 <style>
@@ -243,7 +221,7 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
   .best {
     display: none;
   }
-  .plan h3 {
+  .plan-name {
     font-size: var(--step-1);
   }
   .popular {
@@ -321,7 +299,7 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
     border: 1px dashed var(--ink-line);
     border-radius: var(--radius);
   }
-  .care h3 {
+  .care-title {
     font-size: var(--step-1);
   }
   .care-intro p {
@@ -355,98 +333,6 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
   .care-text {
     color: var(--mist);
     font-size: var(--step--1);
-  }
-
-  /* ---------- Contact strip ---------- */
-  .panel {
-    position: relative;
-    display: grid;
-    gap: var(--space-m);
-    margin-top: var(--space-m);
-    padding: var(--space-m) 1.1rem;
-    border: 1px solid var(--ink-line);
-    border-radius: 1.5rem;
-    background:
-      radial-gradient(ellipse 70% 90% at 100% 0%, rgb(155 225 93 / 0.22), transparent 60%),
-      radial-gradient(ellipse 60% 70% at 0% 100%, rgb(255 122 89 / 0.25), transparent 60%),
-      var(--ink-raised);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .panel-art {
-    position: absolute;
-    right: -7rem;
-    bottom: -6rem;
-    width: 18rem;
-    opacity: 0.14;
-    z-index: -1;
-  }
-  .panel-art :global(.panel-mark .km-mark) {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .panel h3 {
-    font-size: var(--step-2);
-  }
-  .panel-copy p {
-    margin-top: var(--space-xs);
-    color: var(--mist);
-  }
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-s);
-  }
-  .btn--big {
-    min-height: 3.5rem;
-    padding-inline: 2rem;
-    font-size: var(--step-1);
-  }
-  .copy {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-height: 3.5rem;
-    max-width: 100%;
-    padding: 0.5rem 0.5rem 0.5rem 1.1rem;
-    border: 1px solid var(--ink-line);
-    border-radius: 999px;
-    background: rgb(13 27 20 / 0.6);
-    color: var(--chalk);
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .copy:hover {
-    border-color: var(--kiwi);
-  }
-  .copy-email {
-    font-family: var(--font-mono);
-    font-size: clamp(0.75rem, 0.65rem + 0.5vw, 0.94rem);
-    white-space: nowrap;
-  }
-  .copy-hint {
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: var(--ink-line);
-    font-size: var(--step--1);
-    font-weight: 600;
-    transition:
-      background-color 0.2s,
-      color 0.2s;
-  }
-  .copy:global(.is-copied) .copy-hint {
-    background: var(--kiwi);
-    color: var(--ink);
-  }
-  .copy-status {
-    flex-basis: 100%;
-    min-height: 1.5em;
-    font-size: var(--step--1);
-    color: var(--mist);
-  }
-  .copy-status:empty {
-    display: none;
   }
 
   /* ---------- Wider screens ---------- */
@@ -531,36 +417,52 @@ import { packages, carePlans, offer, offerPrice, formatPrice, showOffer } from '
       align-items: center;
       gap: var(--space-l);
     }
-    .panel {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: var(--space-l);
-      padding: var(--space-l);
+  }
+
+  /* Cursor glow on the card border (desktop with a mouse only). */
+  @media (min-width: 56rem) and (hover: hover) and (pointer: fine) {
+    .plan::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(
+        14rem circle at var(--mx, 50%) var(--my, 0%),
+        rgb(155 225 93 / 0.9),
+        rgb(255 122 89 / 0.35) 40%,
+        transparent 70%
+      );
+      mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
     }
-    .panel-art {
-      right: auto;
-      left: 50%;
-      top: 50%;
-      bottom: auto;
-      translate: 0 -50%;
-      width: 22rem;
+    .plan::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(18rem circle at var(--mx, 50%) var(--my, 0%), rgb(155 225 93 / 0.08), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .plan:hover::before,
+    .plan:hover::after {
+      opacity: 1;
     }
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .panel-art :global(.panel-mark .km-mark) {
-      animation: turn 40s linear infinite;
-    }
     /* Desktop only: the free places gently pulse. */
     @media (min-width: 56rem) {
       .pip.is-free {
         animation: pulse 2.4s ease-in-out infinite;
       }
-    }
-  }
-  @keyframes turn {
-    to {
-      transform: rotate(360deg);
     }
   }
   @keyframes pulse {
